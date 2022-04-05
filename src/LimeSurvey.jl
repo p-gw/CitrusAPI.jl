@@ -1,11 +1,14 @@
 module LimeSurvey
 
+using Base64
 using HTTP
 using JSON3
 using UUIDs
 
 export Client
 export connect!, disconnect!
+
+include("utils.jl")
 
 mutable struct Client
     url::String
@@ -43,23 +46,7 @@ function call_limesurvey_api(client::Client, payload; authenticated=true)
     return parsed_body
 end
 
-# methods
-include("methods/activate_survey.jl")
-include("methods/activate_tokens.jl")
-include("methods/add_group.jl")
-include("methods/add_language.jl")
-include("methods/add_participants.jl")
-include("methods/add_response.jl")
-include("methods/add_survey.jl")
-include("methods/copy_survey.jl")
-include("methods/get_session_key.jl")
-include("methods/list_groups.jl")
-include("methods/list_participants.jl")
-include("methods/list_questions.jl")
-include("methods/list_survey_groups.jl")
-include("methods/list_surveys.jl")
-include("methods/list_users.jl")
-include("methods/release_session_key.jl")
+include("methods.jl")
 
 # convenience fns
 function connect!(client::Client, username::String, password::String; plugin="Authdb")
