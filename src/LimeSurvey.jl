@@ -1,6 +1,8 @@
 module LimeSurvey
 
 using Base64
+using CSV
+using DataFrames
 using HTTP
 using JSON3
 using UUIDs

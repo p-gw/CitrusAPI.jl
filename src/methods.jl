@@ -21,9 +21,16 @@ include("methods/delete_response.jl")
 include("methods/delete_survey.jl")
 
 # import endpoints
+include("methods/cpd_import_participants.jl")
 include("methods/import_group.jl")
 include("methods/import_question.jl")
 include("methods/import_survey.jl")
+
+# export endpoints
+include("methods/export_responses.jl")
+include("methods/export_responses_by_token.jl")
+include("methods/export_statistics.jl")
+include("methods/export_timeline.jl")
 
 # list endpoints
 include("methods/list_groups.jl")
