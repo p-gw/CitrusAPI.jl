@@ -31,7 +31,7 @@ end
 
         df = DataFrame(a=1:3, b=["a", "b", "c"])
         df_encoded = dataframe_to_base64csv(df)
-        @test LimeSurvey.base64csv_to_dataframe(df_encoded) == df
+        @test LimeSurvey.base64csv_to_sink(df_encoded, DataFrame) == df
     end
 
     @testset "Client" begin
