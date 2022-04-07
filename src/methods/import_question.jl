@@ -3,7 +3,7 @@ export import_question!
 function import_question!(client::Client, survey_id::Int, group_id::Int, data::String, data_type::String; mandatory=false, title::Union{Nothing,String}=nothing, text::Union{Nothing,String}=nothing, help::Union{Nothing,String}=nothing)
     is_mandatory = mandatory ? "Y" : "N"
     payload = construct_payload("import_question", [client.session_key, survey_id, group_id, data, data_type, is_mandatory, title, text, help])
-    response = call_limesurvey_api(payload)
+    response = call_limesurvey_api(client, payload)
     return response
 end
 

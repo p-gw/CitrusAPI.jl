@@ -5,3 +5,8 @@ function add_survey!(client::Client, survey_id::Int, title::AbstractString, lang
     response = call_limesurvey_api(client, payload)
     return response
 end
+
+function add_survey!(client, survey_id, title, language, sink; kwargs...)
+    response = add_survey!(client, survey_id, title, language; kwargs...)
+    return response.result |> sink
+end

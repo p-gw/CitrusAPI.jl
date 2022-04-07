@@ -5,3 +5,8 @@ function list_users(client::Client; user_id::Union{Nothing,Int}=nothing, usernam
     response = call_limesurvey_api(client, payload)
     return response
 end
+
+function list_users(client, sink; kwargs...)
+    response = list_users(client; kwargs...)
+    return response.result |> sink
+end

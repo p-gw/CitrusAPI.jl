@@ -5,3 +5,8 @@ function list_surveys(client::Client; username::Union{AbstractString,Nothing}=no
     response = call_limesurvey_api(client, payload)
     return response
 end
+
+function list_surveys(client::Client, sink; username=nothing)
+    response = list_surveys(client, username=username)
+    return response.result |> sink
+end

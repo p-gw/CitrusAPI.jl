@@ -6,8 +6,8 @@ function export_responses(client::Client, survey_id::Int, document_type::String;
     return response
 end
 
-function export_responses(client, survey_id; kwargs...)
+function export_responses(client, survey_id, sink=DataFrame; kwargs...)
     response = export_responses(client, survey_id, "csv"; kwargs...)
-    df = base64csv_to_dataframe(response.result)
+    df = base64csv_to_sink(response.result, sink)
     return df
 end
