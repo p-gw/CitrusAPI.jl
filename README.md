@@ -7,10 +7,10 @@ This Julia package provides a thin wrapper for the [LimeSurvey API](https://manu
 Note that this package uses a more "julian" syntax for API methods. Methods that mutate data by either adding, deleting or modifying data are implemented as [bang functions](https://docs.julialang.org/en/v1/manual/style-guide/#bang-convention). For example the API method `add_survey` is implemented as the `add_survey!` function in `LimeSurvey.jl`.  
 
 ## Getting started
-If your LimeSurvey server is set up correctly you can start by setting up a `Client` and connecting to the server. 
+If your LimeSurvey server is set up correctly you can start by setting up a `LimeSurveyClient` and connecting to the server. 
 
 ```julia
-client = Client("https://your-limesurvey-server.com/index.php/admin/remotecontrol")
+client = LimeSurveyClient("https://your-limesurvey-server.com/index.php/admin/remotecontrol")
 connect!(client, "username", "password")
 ```
 

@@ -8,17 +8,17 @@ using HTTP
 using JSON3
 using UUIDs
 
-export Client
+export LimeSurveyClient
 
 include("utils.jl")
 
-mutable struct Client
+mutable struct LimeSurveyClient
     url::String
     session_key::Union{Nothing,String}
 end
 
-function Client(url::String, session_key=nothing)
-    return Client(url, session_key)
+function LimeSurveyClient(url::String, session_key=nothing)
+    return LimeSurveyClient(url, session_key)
 end
 
 function construct_payload(method::AbstractString, params)
@@ -37,7 +37,7 @@ function construct_headers()
     return headers
 end
 
-function call_limesurvey_api(client::Client, payload; authenticated=true)
+function call_limesurvey_api(client::LimeSurveyClient, payload; authenticated=true)
     if (authenticated && isnothing(client.session_key))
         error("Authentication required")
     end

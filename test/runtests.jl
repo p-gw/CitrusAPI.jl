@@ -36,7 +36,7 @@ end
 
     @testset "Client" begin
         url = "https://www.test.co"
-        c = Client(url)
+        c = LimeSurveyClient(url)
         @test c.url == url
         @test isnothing(c.session_key)
     end

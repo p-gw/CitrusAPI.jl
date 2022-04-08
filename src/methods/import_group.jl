@@ -1,6 +1,6 @@
 export import_group!
 
-function import_group!(client::Client, survey_id::Int, data::String, data_type::String; name::Union{Nothing,String}=nothing, description::Union{Nothing,String}=nothing)
+function import_group!(client::LimeSurveyClient, survey_id::Int, data::String, data_type::String; name::Union{Nothing,String}=nothing, description::Union{Nothing,String}=nothing)
     payload = construct_payload("import_group", [client.session_key, survey_id, data, data_type, name, description])
     response = call_limesurvey_api(client, payload)
     return response

@@ -1,6 +1,6 @@
 export get_survey_properties
 
-function get_survey_properties(client::Client, survey_id::Int; settings=nothing)
+function get_survey_properties(client::LimeSurveyClient, survey_id::Int; settings=nothing)
     payload = construct_payload("get_survey_properties", [client.session_key, survey_id, settings])
     response = call_limesurvey_api(client, payload)
     return response
