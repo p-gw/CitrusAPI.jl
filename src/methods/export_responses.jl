@@ -6,7 +6,8 @@ function export_responses(client::LimeSurveyClient, survey_id::Int, document_typ
     return response
 end
 
-function export_responses(client, survey_id, sink=DataFrame; kwargs...)
+function export_responses(client::LimeSurveyClient, survey_id::Int, sink=nothing; kwargs...)
+    isnothing(sink) && throw(ArgumentError("Provide a valid sink argument"))
     response = export_responses(client, survey_id, "csv"; kwargs...)
     df = base64csv_to_sink(response.result, sink)
     return df
