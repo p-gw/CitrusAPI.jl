@@ -1,6 +1,7 @@
 # LimeSurvey
 
 [![Build Status](https://github.com/p-gw/LimeSurvey.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/p-gw/LimeSurvey.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/p-gw/LimeSurvey.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/p-gw/LimeSurvey.jl)
 
 This Julia package provides a thin wrapper for the [LimeSurvey API](https://manual.limesurvey.org/RemoteControl_2_API). For a list of methods see https://api.limesurvey.org/classes/remotecontrol_handle.html.
 
