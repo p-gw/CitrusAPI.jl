@@ -135,7 +135,7 @@ end
         gid = parse(Int, last(s6_groups.result).gid)
         qg2 = list_questions(c, s6.result, gid)
         @test length(qg2.result) == 1
-        @test qg2.result[1].question == qs[2].question
+        @test qg2.result[1].question == qs.result[2].question
 
         # activate surveys
         res = activate_survey!(c, 100000)
