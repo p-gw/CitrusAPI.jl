@@ -80,12 +80,12 @@ end
 
         # list surveys (basic)
         survey_list = list_surveys(c)
-        @test length(survey_list.result) == 5
+        @test length(survey_list.result) == 4
 
         # list surveys (DataFrame sink)
         survey_list = list_surveys(c, DataFrame)
         @test survey_list isa DataFrame
-        @test nrow(survey_list) == 5
+        @test nrow(survey_list) == 4
         @test names(survey_list) == ["sid", "surveyls_title", "startdate", "expires", "active"]
 
         # add question groups
@@ -99,7 +99,7 @@ end
         gl1 = list_groups(c, s1.result)
         @test length(gl1.result) == 2
         @test gl1.result[1][:group_name] == "first group"
-        @test gl1.result[1][:group_name] == "second group"
+        @test gl1.result[2][:group_name] == "second group"
         @test gl1.result[1][:description] == ""
         @test gl1.result[2][:description] == "description"
 
@@ -118,19 +118,19 @@ end
         s6 = import_survey!(c, "limesurvey/813998.lss")
         @test s6.result == 813998
         s6_groups = list_groups(c, s6.result)
-        @test length(s6_groups) == 2
-        @test s6_groups[1].group_name == "test group"
-        @test s6_groups[1].description == "some description"
-        @test s6_groups[2].group_name == "test group 2"
-        @test s6_groups[2].description == "."
+        @test length(s6_groups.result) == 2
+        @test s6_groups.result[1].group_name == "test group"
+        @test s6_groups.result[1].description == "some description"
+        @test s6_groups.result[2].group_name == "test group 2"
+        @test s6_groups.result[2].description == "."
 
         # list questions
         qs = list_questions(c, s6.result)
-        @test length(qs) == 2
-        @test qs[1].question == "Make a long statement!"
-        @test qs[1].help == "need help?"
-        @test qs[2].question == "Rate on a scale from 1 to 5!"
-        @test qs[2].help == "need help?"
+        @test length(qs.result) == 2
+        @test qs.result[1].question == "Make a long statement!"
+        @test qs.result[1].help == "need help?"
+        @test qs.result[2].question == "Rate on a scale from 1 to 5!"
+        @test qs.result[2].help == "need help?"
 
         gid = parse(Int, last(s6_groups.result).gid)
         qg2 = list_questions(c, s6.result, gid)

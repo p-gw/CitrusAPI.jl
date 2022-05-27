@@ -9,7 +9,7 @@ using JSON3
 using UUIDs
 
 export LimeSurveyClient
-export is_activse
+export is_active
 
 include("utils.jl")
 
