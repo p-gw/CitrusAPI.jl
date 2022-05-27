@@ -1,4 +1,4 @@
-name = "LimeSurvey"
+name = "LimeSurveyAPI"
 uuid = "fb58f9c3-ae58-4847-ba51-3b3c84151ac7"
 authors = ["Philipp Gewessler"]
 version = "0.1.0"

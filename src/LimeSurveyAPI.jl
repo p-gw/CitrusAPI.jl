@@ -1,4 +1,4 @@
-module LimeSurvey
+module LimeSurveyAPI
 
 using Base64
 using CSV

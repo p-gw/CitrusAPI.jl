@@ -29,6 +29,7 @@ jobs:
           - x64
     steps:
       - uses: actions/checkout@v2
+      - uses: docker compose -f test/docker-compose.yml up -d --build
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}

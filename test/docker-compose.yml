@@ -1,0 +1,19 @@
+services:
+  limesurvey:
+    image: acspri/limesurvey
+    ports:
+      - 8082:80
+    volumes:
+      - ./limesurvey/plugins:/var/www/html/plugins
+      - ./limesurvey/upload:/var/www/html/upload
+      - ./limesurvey/config:/var/www/html/application/config
+    environment:
+      LIMESURVEY_DB_PASSWORD: somepassword
+      LIMESURVEY_ADMIN_USER: admin
+      LIMESURVEY_ADMIN_PASSWORD: password
+      LIMESURVEY_ADMIN_NAME: Lime Administrator
+      LIMESURVEY_ADMIN_EMAIL: lime@lime.lime
+  mysql:
+    image: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: somepassword
