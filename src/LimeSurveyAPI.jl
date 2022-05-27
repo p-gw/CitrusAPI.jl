@@ -9,6 +9,7 @@ using JSON3
 using UUIDs
 
 export LimeSurveyClient
+export is_activse
 
 include("utils.jl")
 
@@ -49,5 +50,12 @@ function call_limesurvey_api(client::LimeSurveyClient, payload; authenticated=tr
 end
 
 include("methods.jl")
+
+# helpers
+function is_active(client::LimeSurveyClient, survey_id::Int)
+    res = get_survey_properties(client, survey_id)
+    haskey(res.result, "status") && error("Failed with error: $(res.result.status)")
+    return res.result.active == "Y"
+end
 
 end

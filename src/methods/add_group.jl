@@ -5,8 +5,3 @@ function add_group!(client::LimeSurveyClient, survey_id::Int, title::AbstractStr
     response = call_limesurvey_api(client, payload)
     return response
 end
-
-function add_group!(client, survey_id, title, sink; description)
-    response = add_group!(client, survey_id, title; description)
-    return response.result |> sink
-end
