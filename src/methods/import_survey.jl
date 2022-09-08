@@ -1,12 +1,12 @@
 export import_survey!
 
-function import_survey!(client::LimeSurveyClient, data::String, data_type::String; name::Union{Nothing,String}=nothing, id::Union{Nothing,Int}=nothing)
+function import_survey!(client::CitrusClient, data::String, data_type::String; name::Union{Nothing,String}=nothing, id::Union{Nothing,Int}=nothing)
     payload = construct_payload("import_survey", [client.session_key, data, data_type, name, id])
     response = call_limesurvey_api(client, payload)
     return response
 end
 
-function import_survey!(client::LimeSurveyClient, file; kwargs...)
+function import_survey!(client::CitrusClient, file; kwargs...)
     isfile(file) || error("Not a file")
     file_name = filename(file)
     file_ext = fileextension(file_name)

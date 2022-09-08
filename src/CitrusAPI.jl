@@ -1,4 +1,4 @@
-module LimeSurveyAPI
+module CitrusAPI
 
 using Base64
 using CSV
@@ -8,18 +8,18 @@ using HTTP
 using JSON3
 using UUIDs
 
-export LimeSurveyClient
+export CitrusClient
 export is_active
 
 include("utils.jl")
 
-mutable struct LimeSurveyClient
+mutable struct CitrusClient
     url::String
     session_key::Union{Nothing,String}
 end
 
-function LimeSurveyClient(url::String, session_key=nothing)
-    return LimeSurveyClient(url, session_key)
+function CitrusClient(url::String, session_key=nothing)
+    return CitrusClient(url, session_key)
 end
 
 function construct_payload(method::AbstractString, params)
@@ -38,7 +38,7 @@ function construct_headers()
     return headers
 end
 
-function call_limesurvey_api(client::LimeSurveyClient, payload; authenticated=true)
+function call_limesurvey_api(client::CitrusClient, payload; authenticated=true)
     if (authenticated && isnothing(client.session_key))
         error("Authentication required")
     end
@@ -52,7 +52,7 @@ end
 include("methods.jl")
 
 # helpers
-function is_active(client::LimeSurveyClient, survey_id::Int)
+function is_active(client::CitrusClient, survey_id::Int)
     res = get_survey_properties(client, survey_id)
     haskey(res.result, "status") && error("Failed with error: $(res.result.status)")
     return res.result.active == "Y"
