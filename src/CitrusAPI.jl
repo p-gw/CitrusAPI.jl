@@ -8,7 +8,7 @@ using HTTP
 using JSON3
 using UUIDs
 
-export CitrusClient
+export CitrusClient, connect!
 export is_active
 
 include("utils.jl")
@@ -27,6 +27,23 @@ end
 
 function CitrusClient(url::String, session_key=nothing)
     return CitrusClient(url, session_key)
+end
+
+"""
+    connect!(client, username, password; plugin="Authdb")
+
+Connect a LimeSurvey `client` by generating a session key given `username` and `password`.
+
+See also: [`get_session_key`](@ref)
+"""
+function connect!(client::CitrusClient, username::String, password::String; plugin="Authdb")
+    response = get_session_key(client, username, password, plugin=plugin)
+    if !(response.result isa String)
+        error("Failed to connect. Error: $(response.result.status)")
+    end
+    client.session_key = response.result
+    @info "Connected to server '$(client.url)'\n\tSession key: $(client.session_key)"
+    return nothing
 end
 
 function construct_payload(method::AbstractString, params)
