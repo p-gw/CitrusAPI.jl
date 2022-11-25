@@ -6,7 +6,7 @@ export add_survey!
 Adds an empty survey with `survey_id` , `title` and default language `language`.
 Optional parameter `format` sets the question appearance format of the survey.
 
-See also: https://api.limesurvey.org/classes/remotecontrol_handle.html#method_add_survey
+See also: <https://api.limesurvey.org/classes/remotecontrol_handle.html#method_add_survey>
 """
 function add_survey!(client::CitrusClient, survey_id::Int, title::AbstractString, language::AbstractString; format::AbstractString="G")
     payload = construct_payload("add_survey", [client.session_key, survey_id, title, language, format])
