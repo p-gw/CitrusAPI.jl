@@ -60,3 +60,10 @@ disconnect!(client)
 - `import_group!`
 - `import_question!`
 - `import_survey!`
+- `invite_participants`
+- `list_groups`
+- `list_participants`
+- `list_questions`
+- `list_survey_groups`
+- `list_surveys`
+- `list_users`
