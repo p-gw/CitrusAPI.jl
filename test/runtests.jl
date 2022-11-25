@@ -57,10 +57,11 @@ end
 
     @testset "Integration tests" begin
         c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
+
+        @test_throws "Invalid user name or password" connect!(c, "", "")
         connect!(c, "admin", "password")
 
-        initial_surveys = list_surveys(c)
-        @test initial_surveys.result[:status] == "No surveys found"
+        @test_throws "No surveys found" list_surveys(c)
 
         # add surveys
         s1 = add_survey!(c, 123456, "testsurvey-1", "en")
@@ -71,8 +72,7 @@ end
         @test s2.result == 111111
         @test s3.result == 222222
 
-        s4 = add_survey!(c, 999999, "testsurvey-4", "invalid language")
-        @test s4.result[:status] == "Faulty parameters"
+        @test_throws "Faulty parameters" add_survey!(c, 999999, "testsurvey-4", "invalid language")
 
         # duplicate ids result in random survey id
         s5 = add_survey!(c, 123456, "testsurvey-5", "en")
@@ -103,8 +103,7 @@ end
         @test gl1.result[1][:description] == ""
         @test gl1.result[2][:description] == "description"
 
-        gl2 = list_groups(c, s2.result)
-        @test gl2.result[:status] == "No groups found"
+        @test_throws "No groups found" list_groups(c, s2.result)
 
         # list groups (DataFrame sink)
         gl1 = list_groups(c, s1.result, DataFrame)
@@ -138,12 +137,12 @@ end
         @test qg2.result[1].question == qs.result[2].question
 
         # activate surveys
-        res = activate_survey!(c, 100000)
-        @test res.result[:status] == "Error: Invalid survey ID"
-        @test_throws ErrorException is_active(c, 100000)
+        @test_throws LimeSurveyError activate_survey!(c, 100000)
+        @test_throws LimeSurveyError is_active(c, 100000)
 
-        res = activate_survey!(c, s1.result)
-        @test res.result[:status] == "Error: Survey does not pass consistency check"
+        @test_throws LimeSurveyError activate_survey!(c, s1.result)
+        @test_throws "Survey does not pass consistency check" activate_survey!(c, s1.result)
+
         @test is_active(c, s1.result) == false
 
         res = activate_survey!(c, s6.result)  # s6 contains questions and should be ready to activate
