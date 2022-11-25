@@ -67,3 +67,19 @@ disconnect!(client)
 - `list_survey_groups`
 - `list_surveys`
 - `list_users`
+- `mail_registered_participants`
+- `release_session_key`
+- `set_group_properties!`
+- `set_language_properties!`
+- `set_participant_properties!`
+- `set_question_properties!`
+- `set_quota_properties!`
+- `set_survey_properties!`
+- `updade_response!`
+- `upload_file!`
+
+## Convenience functions
+- `connect!`
+- `disconnect!`
+- `expire_survey!`
+- `is_active`
