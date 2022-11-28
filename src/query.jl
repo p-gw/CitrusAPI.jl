@@ -28,8 +28,11 @@ function call_limesurvey_api(client::CitrusClient, payload; authenticated=true)
     end
 
     if parsed_body.result isa JSON3.Object && haskey(parsed_body.result, :status)
-        err = replace(parsed_body.result.status, "Error: " => "")
-        throw(LimeSurveyError(err))
+        err = parsed_body.result.status
+        if err != "OK"
+            err = replace(err, "Error: " => "")
+            throw(LimeSurveyError(err))
+        end
     end
 
     return parsed_body
