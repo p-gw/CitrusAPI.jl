@@ -1,5 +1,4 @@
 export release_session_key
-export disconnect!
 
 """
     release_session_key(client)

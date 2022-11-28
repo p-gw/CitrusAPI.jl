@@ -28,7 +28,7 @@ function connect!(client::CitrusClient, username::String, password::String; plug
     response = get_session_key(client, username, password, plugin=plugin)
     client.session_key = response
     @info "Connected to server '$(client.url)'\n\tSession key: $(client.session_key)"
-    return nothing
+    return response
 end
 
 """
@@ -39,10 +39,10 @@ Disconnect `client` from a LimeSurvey server by releasing the session key.
 See also: [`release_session_key`](@ref)
 """
 function disconnect!(client::CitrusClient)
-    release_session_key(client)
+    response = release_session_key(client)
     client.session_key = nothing
     @info "Disconnected from server '$(client.url)'"
-    return nothing
+    return response
 end
 
 # helpers
