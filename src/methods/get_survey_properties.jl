@@ -15,5 +15,5 @@ end
 
 function get_survey_properties(client, survey_id, sink; settings=nothing)
     response = get_survey_properties(client, survey_id; settings)
-    return response.result |> sink
+    return response |> sink
 end

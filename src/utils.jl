@@ -14,3 +14,15 @@ function base64csv_to_sink(x::AbstractString, sink; kwargs...)::DataFrame
     df = CSV.read(csv_io, sink; kwargs...)
     return df
 end
+
+mutable struct LimeSurveyError <: Exception
+    msg::String
+end
+
+Base.showerror(io::IO, e::LimeSurveyError) = print(io, "LimeSurveyError: ", e.msg)
+
+mutable struct AuthenticationError <: Exception
+    msg::String
+end
+
+Base.showerror(io::IO, e::AuthenticationError) = print(io, "AuthenticationError: ", e.msg)

@@ -16,5 +16,5 @@ end
 
 function list_users(client, sink; kwargs...)
     response = list_users(client; kwargs...)
-    return response.result |> sink
+    return response |> sink
 end

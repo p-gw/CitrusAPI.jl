@@ -16,5 +16,5 @@ end
 
 function set_survey_properties!(client, survey_id, data, sink)
     response = set_survey_properties!(client, survey_id, data)
-    return response.result |> sink
+    return response |> sink
 end

@@ -57,22 +57,22 @@ end
 
     @testset "Integration tests" begin
         c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
+
+        @test_throws LimeSurveyError("Invalid user name or password") connect!(c, "", "")
         connect!(c, "admin", "password")
 
-        initial_surveys = list_surveys(c)
-        @test initial_surveys.result[:status] == "No surveys found"
+        @test_throws LimeSurveyError("No surveys found") list_surveys(c)
 
         # add surveys
         s1 = add_survey!(c, 123456, "testsurvey-1", "en")
         s2 = add_survey!(c, 111111, "testsurvey-2", "en")
         s3 = add_survey!(c, 222222, "testsurvey-3", "en")
 
-        @test s1.result == 123456
-        @test s2.result == 111111
-        @test s3.result == 222222
+        @test s1 == 123456
+        @test s2 == 111111
+        @test s3 == 222222
 
-        s4 = add_survey!(c, 999999, "testsurvey-4", "invalid language")
-        @test s4.result[:status] == "Faulty parameters"
+        @test_throws LimeSurveyError("Faulty parameters") add_survey!(c, 999999, "testsurvey-4", "invalid language")
 
         # duplicate ids result in random survey id
         s5 = add_survey!(c, 123456, "testsurvey-5", "en")
@@ -80,7 +80,7 @@ end
 
         # list surveys (basic)
         survey_list = list_surveys(c)
-        @test length(survey_list.result) == 4
+        @test length(survey_list) == 4
 
         # list surveys (DataFrame sink)
         survey_list = list_surveys(c, DataFrame)
@@ -89,25 +89,24 @@ end
         @test names(survey_list) == ["sid", "surveyls_title", "startdate", "expires", "active"]
 
         # add question groups
-        g1 = add_group!(c, s1.result, "first group")
-        g2 = add_group!(c, s1.result, "second group", description="description")
+        g1 = add_group!(c, s1, "first group")
+        g2 = add_group!(c, s1, "second group", description="description")
 
-        @test g1.result == 1
-        @test g2.result == 2
+        @test g1 == 1
+        @test g2 == 2
 
         # list groups (basic)
-        gl1 = list_groups(c, s1.result)
-        @test length(gl1.result) == 2
-        @test gl1.result[1][:group_name] == "first group"
-        @test gl1.result[2][:group_name] == "second group"
-        @test gl1.result[1][:description] == ""
-        @test gl1.result[2][:description] == "description"
+        gl1 = list_groups(c, s1)
+        @test length(gl1) == 2
+        @test gl1[1][:group_name] == "first group"
+        @test gl1[2][:group_name] == "second group"
+        @test gl1[1][:description] == ""
+        @test gl1[2][:description] == "description"
 
-        gl2 = list_groups(c, s2.result)
-        @test gl2.result[:status] == "No groups found"
+        @test_throws LimeSurveyError("No groups found") list_groups(c, s2)
 
         # list groups (DataFrame sink)
-        gl1 = list_groups(c, s1.result, DataFrame)
+        gl1 = list_groups(c, s1, DataFrame)
         @test nrow(gl1) == 2
         @test gl1[1, :group_name] == "first group"
         @test gl1[2, :group_name] == "second group"
@@ -116,38 +115,37 @@ end
 
         # import surveys
         s6 = import_survey!(c, "limesurvey/813998.lss")
-        @test s6.result == 813998
-        s6_groups = list_groups(c, s6.result)
-        @test length(s6_groups.result) == 2
-        @test s6_groups.result[1].group_name == "test group"
-        @test s6_groups.result[1].description == "some description"
-        @test s6_groups.result[2].group_name == "test group 2"
-        @test s6_groups.result[2].description == "."
+        @test s6 == 813998
+        s6_groups = list_groups(c, s6)
+        @test length(s6_groups) == 2
+        @test s6_groups[1].group_name == "test group"
+        @test s6_groups[1].description == "some description"
+        @test s6_groups[2].group_name == "test group 2"
+        @test s6_groups[2].description == "."
 
         # list questions
-        qs = list_questions(c, s6.result)
-        @test length(qs.result) == 2
-        @test qs.result[1].question == "Make a long statement!"
-        @test qs.result[1].help == "need help?"
-        @test qs.result[2].question == "Rate on a scale from 1 to 5!"
-        @test qs.result[2].help == "need help?"
+        qs = list_questions(c, s6)
+        @test length(qs) == 2
+        @test qs[1].question == "Make a long statement!"
+        @test qs[1].help == "need help?"
+        @test qs[2].question == "Rate on a scale from 1 to 5!"
+        @test qs[2].help == "need help?"
 
-        gid = parse(Int, last(s6_groups.result).gid)
-        qg2 = list_questions(c, s6.result, gid)
-        @test length(qg2.result) == 1
-        @test qg2.result[1].question == qs.result[2].question
+        gid = parse(Int, last(s6_groups).gid)
+        qg2 = list_questions(c, s6, gid)
+        @test length(qg2) == 1
+        @test qg2[1].question == qs[2].question
 
         # activate surveys
-        res = activate_survey!(c, 100000)
-        @test res.result[:status] == "Error: Invalid survey ID"
-        @test_throws ErrorException is_active(c, 100000)
+        @test_throws LimeSurveyError("Invalid survey ID") activate_survey!(c, 100000)
+        @test_throws LimeSurveyError("Invalid survey ID") is_active(c, 100000)
 
-        res = activate_survey!(c, s1.result)
-        @test res.result[:status] == "Error: Survey does not pass consistency check"
-        @test is_active(c, s1.result) == false
+        @test_throws LimeSurveyError("Survey does not pass consistency check") activate_survey!(c, s1)
 
-        res = activate_survey!(c, s6.result)  # s6 contains questions and should be ready to activate
-        @test res.result[:status] == "OK"
-        @test is_active(c, s6.result) == true
+        @test is_active(c, s1) == false
+
+        res = activate_survey!(c, s6)  # s6 contains questions and should be ready to activate
+        @test res[:status] == "OK"
+        @test is_active(c, s6) == true
     end
 end

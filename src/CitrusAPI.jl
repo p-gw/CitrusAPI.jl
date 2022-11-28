@@ -9,7 +9,8 @@ using JSON3
 using UUIDs
 
 export CitrusClient, connect!, disconnect!
-export is_active
+export LimeSurveyError, AuthenticationError
+export is_active, expire_survey!
 
 include("utils.jl")
 include("CitrusClient.jl")
@@ -25,10 +26,7 @@ See also: [`get_session_key`](@ref)
 """
 function connect!(client::CitrusClient, username::String, password::String; plugin="Authdb")
     response = get_session_key(client, username, password, plugin=plugin)
-    if !(response.result isa String)
-        error("Failed to connect. Error: $(response.result.status)")
-    end
-    client.session_key = response.result
+    client.session_key = response
     @info "Connected to server '$(client.url)'\n\tSession key: $(client.session_key)"
     return nothing
 end
@@ -57,8 +55,7 @@ See also: [`get_survey_properties`](@ref)
 """
 function is_active(client::CitrusClient, survey_id::Int)
     res = get_survey_properties(client, survey_id)
-    haskey(res.result, "status") && error("Failed with error: $(res.result.status)")
-    return res.result.active == "Y"
+    return res.active == "Y"
 end
 
 """
