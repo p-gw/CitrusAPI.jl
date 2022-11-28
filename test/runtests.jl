@@ -56,9 +56,9 @@ end
     end
 
     @testset "API Methods" begin
-        @testset "Connection" begin
-            c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
+        c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
 
+        @testset "Connection" begin
             @test_throws LimeSurveyError("Invalid user name or password") get_session_key(c, "", "")
             @test_throws LimeSurveyError("Invalid user name or password") connect!(c, "", "")
 
