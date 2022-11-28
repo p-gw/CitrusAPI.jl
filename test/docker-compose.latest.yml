@@ -1,0 +1,3 @@
+services:
+  limesurvey:
+    image: acspri/limesurvey:latest

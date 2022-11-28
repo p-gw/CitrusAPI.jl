@@ -24,9 +24,12 @@ jobs:
           - ubuntu-latest
         arch:
           - x64
+        lsversion:
+          - 'lts'
+          - 'latest'
     steps:
       - uses: actions/checkout@v2
-      - run: docker-compose -f test/docker-compose.yml up -d --build
+      - run: docker-compose -f test/docker-compose.yml -f test/docker-compose.${{ matrix.lsversion }}.yml up -d --build
       - uses: julia-actions/setup-julia@v1
         with:
           version: ${{ matrix.version }}

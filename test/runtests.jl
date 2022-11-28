@@ -113,7 +113,7 @@ end
             @test is_active(c, s1) == false
 
             res = activate_survey!(c, s6)  # s6 contains questions and should be ready to activate
-            @test res[:status] == "OK"
+            @test res.status == "OK"
             @test is_active(c, s6) == true
 
             # copying surves
@@ -126,7 +126,8 @@ end
             surveys = list_surveys(c, DataFrame)
             @test nrow(surveys) == 6
             @test surveys.sid == string.([s1, s2, s3, s5, s6, s7])
-            @test delete_survey!(c, s7) == "OK"
+            res = delete_survey!(c, s7)
+            @test res.status == "OK"
 
             surveys = list_surveys(c, DataFrame)
             @test nrow(surveys) == 5
@@ -154,26 +155,32 @@ end
             g1 = add_group!(c, s1, "first group")
             g2 = add_group!(c, s1, "second group", description="description")
 
-            @test g1 == 1
-            @test g2 == 2
+            # s6 already imports 4 question groups
+            @test g1 == 5
+            @test g2 == 6
 
             # list groups (basic)
-            gl1 = list_groups(c, s1)
-            @test length(gl1) == 2
-            @test gl1[1][:group_name] == "first group"
-            @test gl1[2][:group_name] == "second group"
-            @test gl1[1][:description] == ""
-            @test gl1[2][:description] == "description"
+            groups = list_groups(c, s1)
+            @test length(groups) == 2
+
+            group1 = groups[1]
+            @test group1.group_name == "first group"
+            @test group2.description == ""
+
+            group2 = groups[2]
+            @test group2.group_name == "second group"
+            @test group2.description == "description"
 
             @test_throws LimeSurveyError("No groups found") list_groups(c, s2)
 
             # list groups (DataFrame sink)
-            gl1 = list_groups(c, s1, DataFrame)
-            @test nrow(gl1) == 2
-            @test gl1[1, :group_name] == "first group"
-            @test gl1[2, :group_name] == "second group"
-            @test gl1[1, :description] == ""
-            @test gl1[2, :description] == "description"
+            groups = list_groups(c, s1, DataFrame)
+            @test nrow(groups) == 2
+
+            @test groups[1, :group_name] == "first group"
+            @test groups[2, :group_name] == "second group"
+            @test groups[1, :description] == ""
+            @test groups[2, :description] == "description"
 
             s6_groups = list_groups(c, s6)
             @test length(s6_groups) == 2
