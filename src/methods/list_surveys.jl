@@ -28,5 +28,5 @@ end
 
 function list_surveys(client::CitrusClient, sink; username=nothing)
     response = list_surveys(client, username=username)
-    return response.result |> sink
+    return response |> sink
 end

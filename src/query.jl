@@ -35,5 +35,5 @@ function call_limesurvey_api(client::CitrusClient, payload; authenticated=true)
         end
     end
 
-    return parsed_body
+    return parsed_body.result
 end

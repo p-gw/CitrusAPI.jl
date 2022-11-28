@@ -16,5 +16,5 @@ end
 
 function list_groups(client, survey_id, sink; language::Union{String,Nothing}=nothing)
     response = list_groups(client, survey_id; language)
-    return response.result |> sink
+    return response |> sink
 end

@@ -26,7 +26,7 @@ See also: [`get_session_key`](@ref)
 """
 function connect!(client::CitrusClient, username::String, password::String; plugin="Authdb")
     response = get_session_key(client, username, password, plugin=plugin)
-    client.session_key = response.result
+    client.session_key = response
     @info "Connected to server '$(client.url)'\n\tSession key: $(client.session_key)"
     return nothing
 end
@@ -55,7 +55,7 @@ See also: [`get_survey_properties`](@ref)
 """
 function is_active(client::CitrusClient, survey_id::Int)
     res = get_survey_properties(client, survey_id)
-    return res.result.active == "Y"
+    return res.active == "Y"
 end
 
 """
