@@ -117,17 +117,19 @@ end
             @test is_active(c, s6) == true
 
             # copying surves
-            s7 = copy_survey!(c, s6, "survey copy")
+            res = copy_survey!(c, s6, "survey copy")
+            s7 = res.newsid
+            @test res.status == "OK"
             @test s7 != s6
 
             # deleting surveys
             surveys = list_surveys(c, DataFrame)
-            @test nrow(surveys) == 7
+            @test nrow(surveys) == 6
             @test surveys.sid == string.([s1, s2, s3, s5, s6, s7])
             @test delete_survey!(c, s7) == "OK"
 
             surveys = list_surveys(c, DataFrame)
-            @test nrow(surveys) == 6
+            @test nrow(surveys) == 5
             @test surveys.sid == string.([s1, s2, s3, s5, s6])
 
             # get survey properties
@@ -144,6 +146,10 @@ end
         end
 
         @testset "Groups" begin
+            s1 = 123456
+            s2 = 111111
+            s6 = 813998
+
             # add question groups
             g1 = add_group!(c, s1, "first group")
             g2 = add_group!(c, s1, "second group", description="description")
@@ -178,6 +184,8 @@ end
         end
 
         @testset "Questions" begin
+            s6 = 813998
+
             # list questions
             qs = list_questions(c, s6)
             @test length(qs) == 2
