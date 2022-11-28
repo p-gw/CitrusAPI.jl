@@ -136,14 +136,36 @@ end
             # get survey properties
             s6_props = get_survey_properties(c, s6)
             @test s6_props.sid == string(s6)
-            @test s6_props.anonymized == "N"
+            @test s6_props.admin == "Lime Administrator"
 
             # set survey properties
-            new_props = set_survey_properties!(c, s6, Dict("anonymized" => "Y"))
-            @test new_props.anonymized == true
+            new_props = set_survey_properties!(c, s6, Dict("admin" => "Test"))
+            @test new_props.admin == true
 
             s6_new_props = get_survey_properties(c, s6)
-            @test s6_new_props.anonymized == "Y"
+            @test s6_new_props.admin == "Test"
+
+            # add language
+            @test add_language!(c, s1, "de").status == "OK"
+            @test get_survey_properties(c, s1).additional_languages == "de"
+
+            # delete language
+            @test delete_language!(c, s1, "de").status == "OK"
+            @test get_survey_properties(c, s1).additional_languages == ""
+
+            # get language properties
+            default_props = get_language_properties(c, s1)
+            @test default_props.surveyls_language == "en"
+            @test default_props == get_language_properties(c, s1; language="en")
+
+            props_noexist = get_language_properties(c, s1; language="de")
+            @test isnothing(props_noexist.surveyls_language)
+
+            # set language properties
+            set_lang = set_language_properties!(c, s1, Dict("surveyls_title" => "testtitle"))
+            @test set_lang.status == "OK"
+            @test set_lang.surveyls_title == true
+            @test get_language_properties(c, s1).surveyls_title == "testtitle"
         end
 
         @testset "Groups" begin
@@ -155,7 +177,7 @@ end
             g1 = add_group!(c, s1, "first group")
             g2 = add_group!(c, s1, "second group", description="description")
 
-            # s6 already imports 4 question groups
+            # s6 already imports question groups
             @test g1 == 5
             @test g2 == 6
 
@@ -163,11 +185,11 @@ end
             groups = list_groups(c, s1)
             @test length(groups) == 2
 
-            group1 = groups[1]
+            group1 = groups[findfirst(x -> x.group_order == "0", groups)]
             @test group1.group_name == "first group"
-            @test group2.description == ""
+            @test group1.description == ""
 
-            group2 = groups[2]
+            group2 = groups[findfirst(x -> x.group_order == "1", groups)]
             @test group2.group_name == "second group"
             @test group2.description == "description"
 
@@ -175,8 +197,9 @@ end
 
             # list groups (DataFrame sink)
             groups = list_groups(c, s1, DataFrame)
-            @test nrow(groups) == 2
+            sort!(groups, :group_order)  # make sure groups are ordered correctly
 
+            @test nrow(groups) == 2
             @test groups[1, :group_name] == "first group"
             @test groups[2, :group_name] == "second group"
             @test groups[1, :description] == ""
@@ -194,25 +217,24 @@ end
             s6 = 813998
 
             # list questions
-            qs = list_questions(c, s6)
-            @test length(qs) == 2
-            @test qs[1].question == "Make a long statement!"
-            @test qs[1].help == "need help?"
-            @test qs[2].question == "Rate on a scale from 1 to 5!"
-            @test qs[2].help == "need help?"
+            questions = list_questions(c, s6)
+            @test length(questions) == 2
+            @test questions[1].question == "Make a long statement!"
+            @test questions[1].help == "need help?"
+            @test questions[2].question == "Rate on a scale from 1 to 5!"
+            @test questions[2].help == "need help?"
 
-            gid = parse(Int, last(s6_groups).gid)
-            qg2 = list_questions(c, s6, gid)
-            @test length(qg2) == 1
-            @test qg2[1].question == qs[2].question
+            groups = list_groups(c, s6)
+            gid = parse(Int, last(groups).gid)
+            questions_g2 = list_questions(c, s6, gid)
+            @test length(questions_g2) == 1
+            @test questions_g2[1].question == questions[2].question
         end
 
         # activate_tokens
-        # add_language
         # add_participants
         # add_response
         # delete_group
-        # delete_language
         # delete_participants
         # delete_question
         # delete_response
@@ -230,7 +252,6 @@ end
         # list_survey_groups
         # list_users
         # get_group_properties
-        # get_language_properties
         # get_participant_properties
         # get_question_properties
         # get_response_ids
@@ -238,7 +259,6 @@ end
         # get_summary
         # get_uploaded_files
         # set_group_properties
-        # set_language_properties
         # set_participant_properties
         # set_question_properties
         # set_quota_properties
