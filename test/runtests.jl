@@ -58,10 +58,10 @@ end
     @testset "Integration tests" begin
         c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
 
-        @test_throws "Invalid user name or password" connect!(c, "", "")
+        @test_throws LimeSurveyError("Invalid user name or password") connect!(c, "", "")
         connect!(c, "admin", "password")
 
-        @test_throws "No surveys found" list_surveys(c)
+        @test_throws LimeSurveyError("No surveys found") list_surveys(c)
 
         # add surveys
         s1 = add_survey!(c, 123456, "testsurvey-1", "en")
@@ -72,7 +72,7 @@ end
         @test s2 == 111111
         @test s3 == 222222
 
-        @test_throws "Faulty parameters" add_survey!(c, 999999, "testsurvey-4", "invalid language")
+        @test_throws LimeSurveyError("Faulty parameters") add_survey!(c, 999999, "testsurvey-4", "invalid language")
 
         # duplicate ids result in random survey id
         s5 = add_survey!(c, 123456, "testsurvey-5", "en")
@@ -103,7 +103,7 @@ end
         @test gl1[1][:description] == ""
         @test gl1[2][:description] == "description"
 
-        @test_throws "No groups found" list_groups(c, s2)
+        @test_throws LimeSurveyError("No groups found") list_groups(c, s2)
 
         # list groups (DataFrame sink)
         gl1 = list_groups(c, s1, DataFrame)
@@ -137,11 +137,10 @@ end
         @test qg2[1].question == qs[2].question
 
         # activate surveys
-        @test_throws LimeSurveyError activate_survey!(c, 100000)
-        @test_throws LimeSurveyError is_active(c, 100000)
+        @test_throws LimeSurveyError("Invalid survey ID") activate_survey!(c, 100000)
+        @test_throws LimeSurveyError("Invalid survey ID") is_active(c, 100000)
 
-        @test_throws LimeSurveyError activate_survey!(c, s1)
-        @test_throws "Survey does not pass consistency check" activate_survey!(c, s1)
+        @test_throws LimeSurveyError("Survey does not pass consistency check") activate_survey!(c, s1)
 
         @test is_active(c, s1) == false
 
