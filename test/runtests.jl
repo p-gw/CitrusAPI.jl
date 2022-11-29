@@ -275,14 +275,14 @@ end
             s6 = 813998
 
             # export responses
-            @test_throws LimeSurveyError export_response(c, s6, "csv")
+            @test_throws LimeSurveyError export_responses(c, s6, "csv")
 
             # add response
-            @test add_response(c, s6, Dict()) == "1"
+            @test add_response!(c, s6, Dict()) == "1"
 
             q = first(list_questions(c, s6))
             question_id = q.sid * "X" * q.gid * "X" * q.qid
-            @test add_response(c, s6, Dict(question_id => "a response")) == "2"
+            @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
 
             @test export_responses(c, s6, "csv") isa String
             responses = export_responses(c, s6, DataFrame)
@@ -309,7 +309,6 @@ end
             @test summary.incomplete_responses == "0"
             @test summary.full_responses == "1"
         end
-
 
         @testset "Participants" begin
             # add_participants
