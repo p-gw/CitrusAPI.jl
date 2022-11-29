@@ -12,3 +12,15 @@ function export_responses_by_token(client::CitrusClient, survey_id::Int, documen
     response = call_limesurvey_api(client, payload)
     return response
 end
+
+"""
+    export_responses_by_token(client, survey_id, token, sink; kwargs...)
+
+Export responses from remote survey with `survey_id` as a Tables.jl compatible `sink`, e.g. `DataFrame`.
+"""
+function export_responses_by_token(client::CitrusClient, survey_id::Int, token::AbstractString, sink=nothing; kwargs...)
+    isnothing(sink) && throw(ArgumentError("Provide a valid sink argument"))
+    response = export_responses_by_token(client, survey_id, "csv", token; kwargs...)
+    df = base64csv_to_sink(response, sink)
+    return df
+end
