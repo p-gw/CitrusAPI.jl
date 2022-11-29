@@ -285,7 +285,7 @@ end
             @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
 
             @test export_responses(c, s6, "csv") isa String
-            responses = export_responses(c, s6, DataFrame)
+            @show responses = export_responses(c, s6, DataFrame)
             @test nrow(responses) == 2
             @test responses.G01Q01 == [missing, "a response"]
 
@@ -311,18 +311,54 @@ end
         end
 
         @testset "Participants" begin
-            # add_participants
-            # delete_participants
+            s6 = 813998
+
+            # activate tokens
+            @test activate_tokens!(c, s6).status == "OK"
+            @test_throws LimeSurveyError activate_tokens!(c, s6)
+
+            # add participants
+            participants = [
+                Dict("email" => "test1@test.co", "firstname" => "participant", "lastname" => "1"),
+                Dict("email" => "test2@test.co", "firstname" => "participant", "lastname" => "2")
+            ]
+
+            participants_response = add_participants!(c, s6, participants)
+            @test length(participants_response) == 2
+            @test get.(participants_response, :email) == ["test1@test.co", "test2@test.co"]
+            @test get.(participants_response, :firstname) == ["participant", "participant"]
+            @test get.(participants_response, :lastname) == ["1", "2"]
+
+            # list participants
+            @test length(list_participants(c, s6, 0)) == 2
+            @test length(list_participants(c, s6, 1)) == 1
+            @test_throws LimeSurveyError("No survey participants found.") list_participants(c, s6, 100)
+
+            # get participant properties
+            tid = "1"
+            token = first(participants_response).token
+            @test get_participant_properties(c, s6, Dict("tid" => tid)).tid == tid
+            @test get_participant_properties(c, s6, Dict("token" => token)).token == token
+            @test keys(get_participant_properties(c, s6, Dict("tid" => tid), properties=["tid", "token"])) == [:tid, :token]
+
+            # set participant properties
+            new_mail = "a@b.com"
+            new_participant = set_participant_properties!(c, s6, Dict("tid" => tid), Dict("email" => new_mail))
+            @test new_participant.email == new_mail
+            @test get_participant_properties(c, s6, Dict("tid" => tid)).email == new_mail
+
+            # delete participants
+            deleted_participants = delete_participants!(c, s6, [1, 2])
+            @test length(deleted_participants) == 2
+            @test deleted_participants[:1] == "Deleted"
+            @test deleted_participants[:2] == "Deleted"
+
             # cpd_import_participants
             # invite_participants
             # mail_registered_participants
             # remind_participants
-            # list_participants
-            # get_participant_properties
-            # set_participant_properties
         end
 
-        # activate_tokens
         # export_statistics
         # export_timeline
         # list_survey_groups
