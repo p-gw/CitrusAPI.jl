@@ -361,9 +361,9 @@ end
 
             # get_summary
             summary = get_summary(c, s6)
-            @test summary.completed_responses == "1"
+            @test summary.completed_responses == "2"
             @test summary.incomplete_responses == "0"
-            @test summary.full_responses == "1"
+            @test summary.full_responses == "2"
         end
 
         # export_statistics
