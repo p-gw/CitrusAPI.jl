@@ -272,6 +272,8 @@ end
         end
 
         @testset "Responses" begin
+            s6 = 813998
+
             # export responses
             @test_throws LimeSurveyError export_response(c, s6, "csv")
 
