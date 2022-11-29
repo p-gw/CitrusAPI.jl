@@ -25,7 +25,7 @@ jobs:
         arch:
           - x64
         lsversion:
-          # - 'lts'
+          - 'lts'
           - 'latest'
     steps:
       - uses: actions/checkout@v2

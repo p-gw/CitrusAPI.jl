@@ -73,7 +73,7 @@ end
         connect!(c, "admin", "password")
 
         @test get_site_settings(c, "versionnumber") isa String
-        LS_VERSION = VersionNumber(get_site_settings(c, "versionnumber"))
+        @show LS_VERSION = VersionNumber(get_site_settings(c, "versionnumber"))
 
         @testset "Surveys" begin
             @test_throws LimeSurveyError("No surveys found") list_surveys(c)
@@ -372,7 +372,8 @@ end
         # export_timeline
 
         # list_survey_groups
-        @test isnothing(list_survey_groups(c))
+        @show survey_groups = list_survey_groups(c)
+        # @test isnothing(list_survey_groups(c))
 
         # list_users
         @test length(list_users(c)) == 1
@@ -383,8 +384,9 @@ end
         participants = list_participants(c, s6)
         token = first(participants).token
 
-        # upload_file
+        @test length(get_uploaded_files(c, s6, token)) == 0
 
+        # upload_file
         # set_quota_properties
     end
 end
