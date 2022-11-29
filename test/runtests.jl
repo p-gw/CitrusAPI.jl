@@ -219,7 +219,7 @@ end
             # import_group
 
             # get group properties
-            g1_props = get_group_properties(c, g1)
+            @show g1_props = get_group_properties(c, g1)
             @test g1_props.gid == string(g1)
             @test g1_props.group_name == "first group"
             @test g1_props.description == ""
@@ -250,14 +250,14 @@ end
 
             # delete_question
             question_id = parse(Int, questions_g2[1].qid)
-            @test delete_question!(c, s6, question_id) == question_id
-            @test_throws LimeSurveyError delete_question!(c, s6, 123)
+            @test delete_question!(c, question_id) == question_id
+            @test_throws LimeSurveyError delete_question!(c, 123)
 
             # import_question
 
             # get_question_properties
             question_id = parse(Int, questions[1].qid)
-            q_props = get_question_properties(c, question_id)
+            @show q_props = get_question_properties(c, question_id)
             @test q_props.question == "Make a long statement!"
             @test q_props.help == "need help?"
 
