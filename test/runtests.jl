@@ -308,10 +308,9 @@ end
             @test get_participant_properties(c, s6, Dict("tid" => tid)).email == new_mail
 
             # delete participants
-            deleted_participants = delete_participants!(c, s6, [1, 2])
-            @test length(deleted_participants) == 2
+            deleted_participants = delete_participants!(c, s6, [1])
+            @test length(deleted_participants) == 1
             @test deleted_participants[:1] == "Deleted"
-            @test deleted_participants[:2] == "Deleted"
 
             # cpd_import_participants
             # invite_participants
