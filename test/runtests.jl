@@ -72,6 +72,9 @@ end
 
         connect!(c, "admin", "password")
 
+        @test get_site_settings(c, "versionnumber") isa String
+        LS_VERSION = VersionNumber(get_site_settings(c, "versionnumber"))
+
         @testset "Surveys" begin
             @test_throws LimeSurveyError("No surveys found") list_surveys(c)
 
@@ -219,7 +222,7 @@ end
             # import_group
 
             # get group properties
-            @show g1_props = get_group_properties(c, g1)
+            g1_props = get_group_properties(c, g1)
             @test g1_props.gid == string(g1)
             @test g1_props.group_name == "first group"
             @test g1_props.description == ""
@@ -251,14 +254,14 @@ end
 
             # delete_question
             question_id = parse(Int, questions_g2[1].qid)
-            @test delete_question!(c, question_id) == question_id
+            @test_throws LimeSurveyError("Survey is active and not editable") delete_question!(c, question_id)
             @test_throws LimeSurveyError delete_question!(c, 123)
 
             # import_question
 
             # get_question_properties
             question_id = parse(Int, questions[1].qid)
-            @show q_props = get_question_properties(c, question_id)
+            q_props = get_question_properties(c, question_id)
             @test q_props.title == "G01Q01"
 
             # set_question_properties
@@ -269,12 +272,40 @@ end
         end
 
         @testset "Responses" begin
-            # add_response
+            # export responses
+            @test_throws LimeSurveyError export_response(c, s6, "csv")
+
+            # add response
+            @test add_response(c, s6, Dict()) == "1"
+
+            q = first(list_questions(c, s6))
+            question_id = q.sid * "X" * q.gid * "X" * q.qid
+            @test add_response(c, s6, Dict(question_id => "a response")) == "2"
+
+            @test export_responses(c, s6, "csv") isa String
+            responses = export_responses(c, s6, DataFrame)
+            @test nrow(responses) == 2
+            @test responses.G01Q01 == [missing, "a response"]
+
             # delete_response
-            # export_responses
+            rm_response = delete_response!(c, s6, 1)
+            @test rm_response[:1] == "deleted"
+            @test nrow(export_responses(c, s6, DataFrame)) == 1
+
+            # update response
+            set_survey_properties!(c, s6, Dict("alloweditaftercompletion" => "Y"))
+            @test update_response!(c, s6, Dict("id" => "2", question_id => "updated response")) == true
+            responses = export_responses(c, s6, DataFrame)
+            @test nrow(responses) == 1
+            @test responses.G01Q01 == ["updated response"]
+
             # export_responses_by_token
-            # update_response
             # get_response_ids
+            # get_summary
+            summary = get_summary(c, s6)
+            @test summary.completed_responses == "1"
+            @test summary.incomplete_responses == "0"
+            @test summary.full_responses == "1"
         end
 
 
@@ -288,15 +319,13 @@ end
             # list_participants
             # get_participant_properties
             # set_participant_properties
-
         end
+
         # activate_tokens
         # export_statistics
         # export_timeline
         # list_survey_groups
         # list_users
-        # get_site_settings
-        # get_summary
         # get_uploaded_files
         # set_quota_properties
         # upload_file
