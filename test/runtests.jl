@@ -287,7 +287,7 @@ end
             @test export_responses(c, s6, "csv") isa String
             responses = export_responses(c, s6, DataFrame)
             @test nrow(responses) == 2
-            @test responses.Test == [missing, "a response"]
+            @test isequal(responses.Test, [missing, "a response"])
 
             # delete_response
             rm_response = delete_response!(c, s6, 1)
