@@ -271,45 +271,6 @@ end
             @test q_newprops.title == "Test"
         end
 
-        @testset "Responses" begin
-            s6 = 813998
-
-            # export responses
-            @test_throws LimeSurveyError export_responses(c, s6, "csv")
-
-            # add response
-            @test add_response!(c, s6, Dict()) == "1"
-
-            q = first(list_questions(c, s6))
-            question_id = q.sid * "X" * q.gid * "X" * q.qid
-            @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
-
-            @test export_responses(c, s6, "csv") isa String
-            responses = export_responses(c, s6, DataFrame)
-            @test nrow(responses) == 2
-            @test isequal(responses.Test, [missing, "a response"])
-
-            # delete_response
-            rm_response = delete_response!(c, s6, 1)
-            @test rm_response[:1] == "deleted"
-            @test nrow(export_responses(c, s6, DataFrame)) == 1
-
-            # update response
-            set_survey_properties!(c, s6, Dict("alloweditaftercompletion" => "Y"))
-            @test update_response!(c, s6, Dict("id" => "2", question_id => "updated response")) == true
-            responses = export_responses(c, s6, DataFrame)
-            @test nrow(responses) == 1
-            @test responses.Test == ["updated response"]
-
-            # export_responses_by_token
-            # get_response_ids
-            # get_summary
-            summary = get_summary(c, s6)
-            @test summary.completed_responses == "1"
-            @test summary.incomplete_responses == "0"
-            @test summary.full_responses == "1"
-        end
-
         @testset "Participants" begin
             s6 = 813998
 
@@ -356,6 +317,54 @@ end
             # invite_participants
             # mail_registered_participants
             # remind_participants
+        end
+
+        @testset "Responses" begin
+            s6 = 813998
+
+            # export responses
+            @test_throws LimeSurveyError export_responses(c, s6, "csv")
+
+            # add response
+            @test add_response!(c, s6, Dict()) == "1"
+
+            q = first(list_questions(c, s6))
+            question_id = q.sid * "X" * q.gid * "X" * q.qid
+            @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
+
+            @test export_responses(c, s6, "csv") isa String
+            responses = export_responses(c, s6, DataFrame)
+            @test nrow(responses) == 2
+            @test isequal(responses.Test, [missing, "a response"])
+
+            # delete_response
+            rm_response = delete_response!(c, s6, 1)
+            @test rm_response[:1] == "deleted"
+            @test nrow(export_responses(c, s6, DataFrame)) == 1
+
+            # update response
+            set_survey_properties!(c, s6, Dict("alloweditaftercompletion" => "Y"))
+            @test update_response!(c, s6, Dict("id" => "2", question_id => "updated response")) == true
+            responses = export_responses(c, s6, DataFrame)
+            @test nrow(responses) == 1
+            @test responses.Test == ["updated response"]
+
+            # export_responses_by_token
+            participants = list_participants(c, s6)
+            token = first(participants).token
+            response = add_response!(c, s6, Dict("token" => token))
+
+            @test export_responses_by_token(c, s6, "csv", token) isa String
+            @test nrow(export_responses_by_token(c, s6, token, DataFrame)) == 1
+
+            # get_response_ids
+            @test get_response_ids(c, s6, token) == [parse(Int, response)]
+
+            # get_summary
+            summary = get_summary(c, s6)
+            @test summary.completed_responses == "1"
+            @test summary.incomplete_responses == "0"
+            @test summary.full_responses == "1"
         end
 
         # export_statistics
