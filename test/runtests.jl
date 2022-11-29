@@ -214,7 +214,7 @@ end
 
             # delete_group
             @test delete_group!(c, s1, g2) == g2
-            @test_throws LimeSurveyError("Invalid group ID") delete_group!(c, s1, 1)
+            @test_throws LimeSurveyError delete_group!(c, s1, 999)
 
             # import_group
 
@@ -247,10 +247,25 @@ end
             questions_g2 = list_questions(c, s6, gid)
             @test length(questions_g2) == 1
             @test questions_g2[1].question == questions[2].question
+
             # delete_question
+            question_id = parse(Int, questions_g2[1].qid)
+            @test delete_question!(c, s6, question_id) == question_id
+            @test_throws LimeSurveyError delete_question!(c, s6, 123)
+
             # import_question
+
             # get_question_properties
+            question_id = parse(Int, questions[1].qid)
+            q_props = get_question_properties(c, question_id)
+            @test q_props.question == "Make a long statement!"
+            @test q_props.help == "need help?"
+
             # set_question_properties
+            set_props = set_question_properties!(c, question_id, Dict("help" => "some help"))
+            @test set_props.help == true
+            q_newprops = get_question_properties(c, question_id)
+            @test q_newprops.help == "some help"
         end
 
         @testset "Responses" begin
