@@ -367,11 +367,24 @@ end
         end
 
         # export_statistics
+        @test export_statistics(c, s6) isa String
+
         # export_timeline
+
         # list_survey_groups
+        @test isnothing(list_survey_groups(c))
+
         # list_users
+        @test length(list_users(c)) == 1
+        @test nrow(list_users(c, DataFrame)) == 1
+
         # get_uploaded_files
-        # set_quota_properties
+        s6 = 813998
+        participants = list_participants(c, s6)
+        token = first(participants).token
+
         # upload_file
+
+        # set_quota_properties
     end
 end
