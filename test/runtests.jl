@@ -285,9 +285,9 @@ end
             @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
 
             @test export_responses(c, s6, "csv") isa String
-            @show responses = export_responses(c, s6, DataFrame)
+            responses = export_responses(c, s6, DataFrame)
             @test nrow(responses) == 2
-            @test responses.G01Q01 == [missing, "a response"]
+            @test responses.Test == [missing, "a response"]
 
             # delete_response
             rm_response = delete_response!(c, s6, 1)
@@ -299,7 +299,7 @@ end
             @test update_response!(c, s6, Dict("id" => "2", question_id => "updated response")) == true
             responses = export_responses(c, s6, DataFrame)
             @test nrow(responses) == 1
-            @test responses.G01Q01 == ["updated response"]
+            @test responses.Test == ["updated response"]
 
             # export_responses_by_token
             # get_response_ids
@@ -330,8 +330,7 @@ end
             @test get.(participants_response, :lastname) == ["1", "2"]
 
             # list participants
-            @test length(list_participants(c, s6, 0)) == 2
-            @test length(list_participants(c, s6, 1)) == 1
+            @test length(list_participants(c, s6)) == 2
             @test_throws LimeSurveyError("No survey participants found.") list_participants(c, s6, 100)
 
             # get participant properties
@@ -339,7 +338,7 @@ end
             token = first(participants_response).token
             @test get_participant_properties(c, s6, Dict("tid" => tid)).tid == tid
             @test get_participant_properties(c, s6, Dict("token" => token)).token == token
-            @test keys(get_participant_properties(c, s6, Dict("tid" => tid), properties=["tid", "token"])) == [:tid, :token]
+            @test collect(keys(get_participant_properties(c, s6, Dict("tid" => tid), properties=["tid", "token"]))) == [:tid, :token]
 
             # set participant properties
             new_mail = "a@b.com"
