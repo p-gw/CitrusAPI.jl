@@ -211,6 +211,24 @@ end
             @test s6_groups[1].description == "some description"
             @test s6_groups[2].group_name == "test group 2"
             @test s6_groups[2].description == "."
+
+            # delete_group
+            @test delete_group!(c, s1, g2) == g2
+            @test_throws LimeSurveyError("Invalid group ID") delete_group!(c, s1, 1)
+
+            # import_group
+
+            # get group properties
+            g1_props = get_group_properties(c, g1)
+            @test g1_props.gid == string(g1)
+            @test g1_props.group_name == "first group"
+            @test g1_props.description == ""
+
+            # set_group_properties
+            set_props = set_group_properties!(c, g1, Dict("group_name" => "newname"))
+            @test set_props.group_name == true
+            g1_newprops = get_group_properties(c, g1)
+            @test g1_newprops.group_name == "newname"
         end
 
         @testset "Questions" begin
@@ -229,40 +247,43 @@ end
             questions_g2 = list_questions(c, s6, gid)
             @test length(questions_g2) == 1
             @test questions_g2[1].question == questions[2].question
+            # delete_question
+            # import_question
+            # get_question_properties
+            # set_question_properties
         end
 
+        @testset "Responses" begin
+            # add_response
+            # delete_response
+            # export_responses
+            # export_responses_by_token
+            # update_response
+            # get_response_ids
+        end
+
+
+        @testset "Participants" begin
+            # add_participants
+            # delete_participants
+            # cpd_import_participants
+            # invite_participants
+            # mail_registered_participants
+            # remind_participants
+            # list_participants
+            # get_participant_properties
+            # set_participant_properties
+
+        end
         # activate_tokens
-        # add_participants
-        # add_response
-        # delete_group
-        # delete_participants
-        # delete_question
-        # delete_response
-        # cpd_import_participants
-        # import_group
-        # import_question
-        # invite_participants
-        # mail_registered_participants
-        # remind_participants
-        # export_responses
-        # export_responses_by_token
         # export_statistics
         # export_timeline
-        # list_participants
         # list_survey_groups
         # list_users
-        # get_group_properties
-        # get_participant_properties
-        # get_question_properties
-        # get_response_ids
         # get_site_settings
         # get_summary
         # get_uploaded_files
-        # set_group_properties
-        # set_participant_properties
-        # set_question_properties
         # set_quota_properties
-        # update_response
         # upload_file
     end
 end
