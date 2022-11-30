@@ -218,11 +218,11 @@ end
 
             group1 = groups[findfirst(x -> x.group_order == "1", groups)]
             @test group1.group_name == "question group 1"
-            @test group1.description == ""
+            @test isnothing(group1.description)
 
             group2 = groups[findfirst(x -> x.group_order == "2", groups)]
             @test group2.group_name == "question group 2"
-            @test group2.description == ""
+            @test isnothing(group2.description)
 
             # delete group
             @test delete_group!(c, s1, g2) == g2
@@ -350,7 +350,7 @@ end
             set_survey_properties!(c, s, Dict("alloweditaftercompletion" => "Y"))
 
             activate_tokens!(c, s)
-            add_participants!(c, s, Dict("email" => "test@test.co", "firstname" => "A", "lastname" => "B"))
+            add_participants!(c, s, [Dict("email" => "test@test.co", "firstname" => "A", "lastname" => "B")])
             token = get_participant_properties(c, s, Dict("tid" => "1")).token
 
             # export responses
@@ -410,7 +410,7 @@ end
         end
 
         # list_survey_groups
-        @show survey_groups = list_survey_groups(c)
+        survey_groups = list_survey_groups(c)
         @test length(survey_groups) == 1
 
         # list_users
