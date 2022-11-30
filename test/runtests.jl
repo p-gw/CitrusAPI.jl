@@ -73,7 +73,7 @@ end
         connect!(c, "admin", "password")
 
         @test get_site_settings(c, "versionnumber") isa String
-        @show LS_VERSION = VersionNumber(get_site_settings(c, "versionnumber"))
+        LS_VERSION = VersionNumber(get_site_settings(c, "versionnumber"))
 
         @testset "Surveys" begin
             @test_throws LimeSurveyError("No surveys found") list_surveys(c)
@@ -105,8 +105,8 @@ end
             @test names(surveys) == ["sid", "surveyls_title", "startdate", "expires", "active"]
 
             # import surveys
-            s6 = import_survey!(c, "limesurvey/813998.lss")
-            @test s6 == 813998
+            s6 = import_survey!(c, "limesurvey/999999.lss")
+            @test s6 == 999999
 
             # activate surveys
             @test_throws LimeSurveyError("Invalid survey ID") activate_survey!(c, 100000)
@@ -169,20 +169,25 @@ end
             @test set_lang.status == "OK"
             @test set_lang.surveyls_title == true
             @test get_language_properties(c, s1).surveyls_title == "testtitle"
+
+            # clean up remaining surveys
+            for s in [s1, s2, s3, s5, s6]
+                res = delete_survey!(c, s)
+                @test res.status == "OK"
+            end
         end
 
         @testset "Groups" begin
-            s1 = 123456
-            s2 = 111111
-            s6 = 813998
+            s1 = add_survey!(c, 100_000, "testsurvey", "en")
+            s2 = add_survey!(c, 100_001, "testsurvey", "en")
+            s3 = import_survey!(c, "limesurvey/999999.lss")
 
             # add question groups
             g1 = add_group!(c, s1, "first group")
             g2 = add_group!(c, s1, "second group", description="description")
 
-            # s6 already imports question groups
-            @test g1 == 5
-            @test g2 == 6
+            @test g1 isa Integer
+            @test g2 isa Integer
 
             # list groups (basic)
             groups = list_groups(c, s1)
@@ -208,75 +213,86 @@ end
             @test groups[1, :description] == ""
             @test groups[2, :description] == "description"
 
-            s6_groups = list_groups(c, s6)
-            @test length(s6_groups) == 2
-            @test s6_groups[1].group_name == "test group"
-            @test s6_groups[1].description == "some description"
-            @test s6_groups[2].group_name == "test group 2"
-            @test s6_groups[2].description == "."
+            groups = list_groups(c, s3)
+            @test length(groups) == 2
+            @test groups[1].group_name == "question group 1"
+            @test groups[1].description == ""
+            @test groups[2].group_name == "question group 2"
+            @test groups[2].description == ""
 
-            # delete_group
+            # delete group
             @test delete_group!(c, s1, g2) == g2
             @test_throws LimeSurveyError delete_group!(c, s1, 999)
 
-            # import_group
+            # TODO: import_group
 
             # get group properties
-            g1_props = get_group_properties(c, g1)
-            @test g1_props.gid == string(g1)
-            @test g1_props.group_name == "first group"
-            @test g1_props.description == ""
+            props = get_group_properties(c, g1)
+            @test props.gid == string(g1)
+            @test props.group_name == "first group"
+            @test props.description == ""
 
             # set_group_properties
             # TODO: figure out why this fails with LimeSurveyError: No valid Data
-            # set_props = set_group_properties!(c, g1, Dict("group_name" => "newname"))
-            # @test set_props.group_name == true
-            # g1_newprops = get_group_properties(c, g1)
-            # @test g1_newprops.group_name == "newname"
+            props = set_group_properties!(c, g1, Dict("description" => "some description"))
+            @test props.description == true
+            props = get_group_properties(c, g1)
+            @test props.description == "some description"
+
+            # clean up surveys
+            for s in [s1, s2, s3]
+                res = delete_survey!(c, s)
+                @test res.status == "OK"
+            end
         end
 
         @testset "Questions" begin
-            s6 = 813998
+            s = import_survey!(c, "limesurvey/999999.lss")
 
             # list questions
-            questions = list_questions(c, s6)
+            questions = list_questions(c, s)
             @test length(questions) == 2
             @test questions[1].question == "Make a long statement!"
             @test questions[1].help == "need help?"
             @test questions[2].question == "Rate on a scale from 1 to 5!"
             @test questions[2].help == "need help?"
 
-            groups = list_groups(c, s6)
+            groups = list_groups(c, s)
             gid = parse(Int, last(groups).gid)
-            questions_g2 = list_questions(c, s6, gid)
+            questions_g2 = list_questions(c, s, gid)
             @test length(questions_g2) == 1
             @test questions_g2[1].question == questions[2].question
 
-            # delete_question
-            question_id = parse(Int, questions_g2[1].qid)
-            @test_throws LimeSurveyError("Survey is active and not editable") delete_question!(c, question_id)
+            # delete question
+            qid = parse(Int, questions_g2[1].qid)
             @test_throws LimeSurveyError delete_question!(c, 123)
+            @test delete_question!(c, qid) == qid
+            @test_throws LimeSurveyError("No questions found") list_questions(c, s, gid)
 
-            # import_question
+            # TODO: import question
 
-            # get_question_properties
-            question_id = parse(Int, questions[1].qid)
-            q_props = get_question_properties(c, question_id)
-            @test q_props.title == "G01Q01"
+            # get question properties
+            qid = parse(Int, questions[1].qid)
+            props = get_question_properties(c, qid)
+            @test q_props.title == "q1"
 
             # set_question_properties
-            set_props = set_question_properties!(c, question_id, Dict("title" => "Test"))
-            @test set_props.title == true
-            q_newprops = get_question_properties(c, question_id)
-            @test q_newprops.title == "Test"
+            props = set_question_properties!(c, qid, Dict("title" => "question1"))
+            @test props.title == true
+            props = get_question_properties(c, qid)
+            @test props.title == "question1"
+
+            # clean up survey
+            res = delete_survey!(c, s)
+            @test res.status == "OK"
         end
 
         @testset "Participants" begin
-            s6 = 813998
+            s = import_survey!(c, "limesurvey/999999.lss")
 
             # activate tokens
-            @test activate_tokens!(c, s6).status == "OK"
-            @test_throws LimeSurveyError activate_tokens!(c, s6)
+            @test activate_tokens!(c, s).status == "OK"
+            @test_throws LimeSurveyError activate_tokens!(c, s)
 
             # add participants
             participants = [
@@ -284,31 +300,31 @@ end
                 Dict("email" => "test2@test.co", "firstname" => "participant", "lastname" => "2")
             ]
 
-            participants_response = add_participants!(c, s6, participants)
+            participants_response = add_participants!(c, s, participants)
             @test length(participants_response) == 2
             @test get.(participants_response, :email) == ["test1@test.co", "test2@test.co"]
             @test get.(participants_response, :firstname) == ["participant", "participant"]
             @test get.(participants_response, :lastname) == ["1", "2"]
 
             # list participants
-            @test length(list_participants(c, s6)) == 2
-            @test_throws LimeSurveyError("No survey participants found.") list_participants(c, s6, 100)
+            @test length(list_participants(c, s)) == 2
+            @test_throws LimeSurveyError("No survey participants found.") list_participants(c, s, 100)
 
             # get participant properties
             tid = "1"
             token = first(participants_response).token
-            @test get_participant_properties(c, s6, Dict("tid" => tid)).tid == tid
-            @test get_participant_properties(c, s6, Dict("token" => token)).token == token
-            @test collect(keys(get_participant_properties(c, s6, Dict("tid" => tid), properties=["tid", "token"]))) == [:tid, :token]
+            @test get_participant_properties(c, s, Dict("tid" => tid)).tid == tid
+            @test get_participant_properties(c, s, Dict("token" => token)).token == token
+            @test collect(keys(get_participant_properties(c, s, Dict("tid" => tid), properties=["tid", "token"]))) == [:tid, :token]
 
             # set participant properties
-            new_mail = "a@b.com"
-            new_participant = set_participant_properties!(c, s6, Dict("tid" => tid), Dict("email" => new_mail))
+            new_mail = "a@b.co"
+            new_participant = set_participant_properties!(c, s, Dict("tid" => tid), Dict("email" => new_mail))
             @test new_participant.email == new_mail
-            @test get_participant_properties(c, s6, Dict("tid" => tid)).email == new_mail
+            @test get_participant_properties(c, s, Dict("tid" => tid)).email == new_mail
 
             # delete participants
-            deleted_participants = delete_participants!(c, s6, [1])
+            deleted_participants = delete_participants!(c, s, [1])
             @test length(deleted_participants) == 1
             @test deleted_participants[:1] == "Deleted"
 
@@ -316,77 +332,85 @@ end
             # invite_participants
             # mail_registered_participants
             # remind_participants
+
+            # clean up survey
+            res = delete_survey!(c, s)
+            @test res.status == "OK"
         end
 
         @testset "Responses" begin
-            s6 = 813998
+            s = import_survey!(c, "limesurvey/999999.lss")
+            q = first(list_questions(c, s))
+
+            activate_survey!(c, s)
+            set_survey_properties!(c, s, Dict("alloweditaftercompletion" => "Y"))
 
             # export responses
-            @test_throws LimeSurveyError export_responses(c, s6, "csv")
+            @test_throws LimeSurveyError export_responses(c, s, "csv")
 
             # add response
-            @test add_response!(c, s6, Dict()) == "1"
+            @test add_response!(c, s, Dict()) == "1"
 
-            q = first(list_questions(c, s6))
-            question_id = q.sid * "X" * q.gid * "X" * q.qid
-            @test add_response!(c, s6, Dict(question_id => "a response")) == "2"
+            qid = q.sid * "X" * q.gid * "X" * q.qid
+            @test add_response!(c, s, Dict(qid => "a response")) == "2"
 
-            @test export_responses(c, s6, "csv") isa String
-            responses = export_responses(c, s6, DataFrame)
+            @test export_responses(c, s, "csv") isa String
+            responses = export_responses(c, s, DataFrame)
             @test nrow(responses) == 2
-            @test isequal(responses.Test, [missing, "a response"])
+            @test isequal(responses.q1, [missing, "a response"])
+            @test isequal(responses.q2, [missing, missing])
 
-            # delete_response
-            rm_response = delete_response!(c, s6, 1)
-            @test rm_response[:1] == "deleted"
-            @test nrow(export_responses(c, s6, DataFrame)) == 1
+            # delete response
+            deleted_response = delete_response!(c, s, 1)
+            @test deleted_response[:1] == "deleted"
+            @test nrow(export_responses(c, s, DataFrame)) == 1
 
             # update response
-            set_survey_properties!(c, s6, Dict("alloweditaftercompletion" => "Y"))
-            @test update_response!(c, s6, Dict("id" => "2", question_id => "updated response")) == true
-            responses = export_responses(c, s6, DataFrame)
+            @test update_response!(c, s, Dict("id" => "2", qid => "updated response")) == true
+            responses = export_responses(c, s, DataFrame)
             @test nrow(responses) == 1
-            @test responses.Test == ["updated response"]
+            @test responses.q1 == ["updated response"]
 
-            # export_responses_by_token
-            participants = list_participants(c, s6)
+            # export responses by token
+            participants = list_participants(c, s)
             token = first(participants).token
-            response = add_response!(c, s6, Dict("token" => token))
+            response = add_response!(c, s, Dict("token" => token))
 
-            @test export_responses_by_token(c, s6, "csv", token) isa String
-            @test nrow(export_responses_by_token(c, s6, token, DataFrame)) == 1
+            @test export_responses_by_token(c, s, "csv", token) isa String
+            @test nrow(export_responses_by_token(c, s, token, DataFrame)) == 1
 
-            # get_response_ids
-            @test get_response_ids(c, s6, token) == [parse(Int, response)]
+            # get response_ids
+            @test get_response_ids(c, s, token) == [parse(Int, response)]
 
-            # get_summary
-            summary = get_summary(c, s6)
+            # get summary
+            summary = get_summary(c, s)
             @test summary.completed_responses == "2"
             @test summary.incomplete_responses == "0"
             @test summary.full_responses == "2"
+
+            # export statistics
+            @test export_statistics(c, s) isa String
+
+            # TODO: export timeline
+            # TODO: get uploaded files
+            participants = list_participants(c, s)
+            token = first(participants).token
+            @test length(get_uploaded_files(c, s, token)) == 0
+
+            # TODO: upload file
+
+            # clean up survey
+            res = delete_survey!(c, s)
+            @test res.status == "OK"
         end
-
-        # export_statistics
-        @test export_statistics(c, s6) isa String
-
-        # export_timeline
 
         # list_survey_groups
         @show survey_groups = list_survey_groups(c)
-        # @test isnothing(list_survey_groups(c))
 
         # list_users
         @test length(list_users(c)) == 1
         @test nrow(list_users(c, DataFrame)) == 1
 
-        # get_uploaded_files
-        s6 = 813998
-        participants = list_participants(c, s6)
-        token = first(participants).token
-
-        @test length(get_uploaded_files(c, s6, token)) == 0
-
-        # upload_file
         # set_quota_properties
     end
 end
