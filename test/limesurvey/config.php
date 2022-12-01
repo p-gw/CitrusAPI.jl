@@ -31,9 +31,9 @@ return array(
             'username' =>'root',
             'password' =>'somepassword',
             'charset' => 'utf8mb4',
-'attributes' => array(),
-            'tablePrefix' =>'',
-        ),
+            'attributes' => array(),
+                        'tablePrefix' =>'',
+                    ),
 
         // Uncomment the following lines if you need table-based sessions.
         // Note: Table-based sessions are currently not supported on MSSQL server.
@@ -63,7 +63,9 @@ return array(
         // 'force_xmlsettings_for_survey_rendering' => true, // Uncomment if you want to force the use of the XML file rather than DB (for easy theme development)
         // 'use_asset_manager'=>true, // Uncomment if you want to use debug mode and asset manager at the same time
         // Update default LimeSurvey config here
-        'RPCInterface'=>'json'
+        'RPCInterface'=>'json',
+        'rpc_publish_api' => true,
+        'maxLoginAttempt' => 10,
     )
 );
 /* End of file config.php */

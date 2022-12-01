@@ -1,12 +1,9 @@
 services:
   limesurvey:
-    image: acspri/limesurvey
+    build:
+      dockerfile: Dockerfile
     ports:
       - 8082:80
-    volumes:
-      - ./limesurvey/plugins:/var/www/html/plugins
-      - ./limesurvey/upload:/var/www/html/upload
-      - ./limesurvey/config:/var/www/html/application/config
     environment:
       LIMESURVEY_DB_PASSWORD: somepassword
       LIMESURVEY_ADMIN_USER: admin

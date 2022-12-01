@@ -1,3 +1,5 @@
 services:
   limesurvey:
-    image: acspri/limesurvey:latest
+    build:
+      args:
+        LS_VERSION: latest
