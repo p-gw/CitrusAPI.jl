@@ -1,0 +1,5 @@
+services:
+  limesurvey:
+    build:
+      args:
+        LS_VERSION: lts
