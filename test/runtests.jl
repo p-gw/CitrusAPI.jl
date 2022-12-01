@@ -436,7 +436,7 @@ end
             if LS_VERSION <= v"3"
                 @test_broken length(survey_groups) == 1
             else
-                @testlength(survey_groups) == 1
+                @test length(survey_groups) == 1
             end
         end
 
