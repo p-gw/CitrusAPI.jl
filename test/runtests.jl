@@ -155,7 +155,16 @@ end
             # delete language
             # FIXME: Languages are not deleted on LimeSuvey LTS even no error is returned
             @test delete_language!(c, s1, "de").status == "OK"
-            @test get_survey_properties(c, s1).additional_languages == "" broken = LS_VERSION.major == 3
+
+            if VERSION >= v"1.7"
+                @test get_survey_properties(c, s1).additional_languages == "" broken = LS_VERSION <= v"3"
+            else
+                if LS_VERSION <= v"3"
+                    @test_broken get_survey_properties(c, s1).additional_languages == ""
+                else
+                    @test get_survey_properties(c, s1).additional_languages == ""
+                end
+            end
 
             # get language properties
             default_props = get_language_properties(c, s1)
@@ -223,7 +232,7 @@ end
             @test group1.group_name == "question group 1"
             @test group2.group_name == "question group 2"
 
-            if LS_VERSION.major == 3
+            if LS_VERSION <= v"3"
                 @test group1.description == ""
                 @test group2.description == ""
             else
@@ -421,7 +430,15 @@ end
         survey_groups = list_survey_groups(c)
 
         # FIXME: for some reason the API just returns null on LimeSurvey LTS
-        @test length(survey_groups) == 1 broken = LS_VERSION.major == 3
+        if VERSION >= v"1.7"
+            @test length(survey_groups) == 1 broken = LS_VERSION <= v"3"
+        else
+            if LS_VERSION <= v"3"
+                @test_broken length(survey_groups) == 1
+            else
+                @testlength(survey_groups) == 1
+            end
+        end
 
         # list_users
         @test length(list_users(c)) == 1
