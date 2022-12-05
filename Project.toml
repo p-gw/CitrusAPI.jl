@@ -1,7 +1,7 @@
 name = "CitrusAPI"
 uuid = "fb58f9c3-ae58-4847-ba51-3b3c84151ac7"
 authors = ["Philipp Gewessler"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 Base64 = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
