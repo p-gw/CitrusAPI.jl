@@ -65,8 +65,8 @@ Set the expiry date of the remote survey with `survey_id`.
 
 See also: [`set_survey_properties!`](@ref)
 """
-function expire_survey!(client, survey_id, date::Union{Date,DateTime}=now())
-    response = set_survey_properties!(client, survey_id, Dict("expires" => date))
+function expire_survey!(client, survey_id, datetime::DateTime=now())
+    response = set_survey_properties!(client, survey_id, Dict("expires" => datetime))
     return response
 end
 

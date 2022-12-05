@@ -1,11 +1,7 @@
 function construct_payload(method::AbstractString, params)
     request_id = string(UUIDs.uuid4())
-    payload = Dict(
-        "method" => method,
-        "params" => params,
-        "id" => request_id
-    )
-    json_payload = JSON3.write(payload)
+    payload = Dict("method" => method, "params" => params, "id" => request_id)
+    json_payload = JSON3.write(payload, dateformat=dateformat"yyyy-mm-dd HH:MM:SS")
     return json_payload
 end
 

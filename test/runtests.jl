@@ -180,6 +180,16 @@ end
             @test set_lang.surveyls_title == true
             @test get_language_properties(c, s1).surveyls_title == "testtitle"
 
+            # expire survey
+            df = dateformat"yyyy-mm-dd HH:MM:SS"
+            expire_at = DateTime("2022-01-01 12:30:15", df)
+            props = expire_survey!(c, s1, expire_at)
+            @test props.expires == true
+
+            expire_date = get_survey_properties(c, s1).expires
+            parsed_expire_date = DateTime(expire_date, df)
+            @test parsed_expire_date == expire_at
+
             # clean up remaining surveys
             for s in [s1, s2, s3, s5, s6]
                 res = delete_survey!(c, s)
