@@ -10,7 +10,7 @@ using UUIDs
 
 export CitrusClient, connect!, disconnect!
 export LimeSurveyError, AuthenticationError
-export is_active, expire_survey!
+export is_active, expire_survey!, start_survey!
 
 include("utils.jl")
 include("CitrusClient.jl")
