@@ -10,7 +10,7 @@ using UUIDs
 
 export CitrusClient, connect!, disconnect!
 export LimeSurveyError, AuthenticationError
-export is_active, expire_survey!
+export is_active, expire_survey!, start_survey!
 
 include("utils.jl")
 include("CitrusClient.jl")
@@ -59,14 +59,26 @@ function is_active(client::CitrusClient, survey_id::Int)
 end
 
 """
+    start_survey!(client, survey_id, datetime=now())
+
+Set the start date of the remote survey with `survey_id`
+
+See also: [`set_survey_properties!`](@ref)
+"""
+function start_survey!(client, survey_id, datetime::DateTime=now())
+    response = set_survey_properties!(client, survey_id, Dict("startdate" => datetime))
+    return response
+end
+
+"""
     expire_survey!(client, survey_id, date=now())
 
 Set the expiry date of the remote survey with `survey_id`.
 
 See also: [`set_survey_properties!`](@ref)
 """
-function expire_survey!(client, survey_id, date::Union{Date,DateTime}=now())
-    response = set_survey_properties!(client, survey_id, Dict("expires" => date))
+function expire_survey!(client, survey_id, datetime::DateTime=now())
+    response = set_survey_properties!(client, survey_id, Dict("expires" => datetime))
     return response
 end
 

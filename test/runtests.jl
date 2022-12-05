@@ -4,6 +4,7 @@ using Test
 using Base64
 using CSV
 using DataFrames
+using Dates
 using JSON3
 
 function dataframe_to_base64csv(df::DataFrame)
@@ -179,6 +180,25 @@ end
             @test set_lang.status == "OK"
             @test set_lang.surveyls_title == true
             @test get_language_properties(c, s1).surveyls_title == "testtitle"
+
+            # start survey
+            df = dateformat"yyyy-mm-dd HH:MM:SS"
+            starts_at = DateTime("2022-01-01 12:00:00", df)
+            props = start_survey!(c, s1, starts_at)
+            @test props.startdate == true
+
+            start_date = get_survey_properties(c, s1).startdate
+            parsed_start_date = DateTime(start_date, df)
+            @test parsed_start_date == starts_at
+
+            # expire survey
+            expire_at = DateTime("2022-01-01 12:30:15", df)
+            props = expire_survey!(c, s1, expire_at)
+            @test props.expires == true
+
+            expire_date = get_survey_properties(c, s1).expires
+            parsed_expire_date = DateTime(expire_date, df)
+            @test parsed_expire_date == expire_at
 
             # clean up remaining surveys
             for s in [s1, s2, s3, s5, s6]
