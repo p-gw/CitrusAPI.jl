@@ -181,8 +181,17 @@ end
             @test set_lang.surveyls_title == true
             @test get_language_properties(c, s1).surveyls_title == "testtitle"
 
-            # expire survey
+            # start survey
             df = dateformat"yyyy-mm-dd HH:MM:SS"
+            starts_at = DateTime("2022-01-01 12:00:00", df)
+            props = start_survey!(c, s1, starts_at)
+            @test props.startdate == true
+
+            start_date = get_survey_properties(c, s1).startdate
+            parsed_start_date = DateTime(start_date, df)
+            @test parsed_start_date == starts_at
+
+            # expire survey
             expire_at = DateTime("2022-01-01 12:30:15", df)
             props = expire_survey!(c, s1, expire_at)
             @test props.expires == true

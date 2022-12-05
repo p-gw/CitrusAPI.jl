@@ -59,6 +59,18 @@ function is_active(client::CitrusClient, survey_id::Int)
 end
 
 """
+    start_survey!(client, survey_id, datetime=now())
+
+Set the start date of the remote survey with `survey_id`
+
+See also: [`set_survey_properties!`](@ref)
+"""
+function start_survey!(client, survey_id, datetime::DateTime=now())
+    response = set_survey_properties!(client, survey_id, Dict("startdate" => datetime))
+    return response
+end
+
+"""
     expire_survey!(client, survey_id, date=now())
 
 Set the expiry date of the remote survey with `survey_id`.

@@ -91,3 +91,4 @@ Note that CitrusAPI uses a more "julian" syntax for API methods. Methods that mu
 - `disconnect!`
 - `expire_survey!`
 - `is_active`
+- `start_survey!`
