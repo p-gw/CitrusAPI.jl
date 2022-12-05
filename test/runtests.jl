@@ -4,6 +4,7 @@ using Test
 using Base64
 using CSV
 using DataFrames
+using Dates
 using JSON3
 
 function dataframe_to_base64csv(df::DataFrame)
