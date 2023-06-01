@@ -12,4 +12,3 @@ function add_language!(client::CitrusClient, survey_id::Int, language::AbstractS
     response = call_limesurvey_api(client, payload)
     return response
 end
-
