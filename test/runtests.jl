@@ -146,17 +146,18 @@ end
             # deleting surveys
             surveys = list_surveys(c, DataFrame)
             @test nrow(surveys) == 6
-            @test surveys.sid == string.([s1, s2, s3, s5, s6, s7])
+            @test string.(surveys.sid) == string.([s1, s2, s3, s5, s6, s7])
+
             res = delete_survey!(c, s7)
             @test res.status == "OK"
 
             surveys = list_surveys(c, DataFrame)
             @test nrow(surveys) == 5
-            @test surveys.sid == string.([s1, s2, s3, s5, s6])
+            @test string.(surveys.sid) == string.([s1, s2, s3, s5, s6])
 
             # get survey properties
             s6_props = get_survey_properties(c, s6)
-            @test s6_props.sid == string(s6)
+            @test string(s6_props.sid) == string(s6)
             @test s6_props.admin == "Lime Administrator"
 
             # set survey properties
@@ -242,11 +243,11 @@ end
             groups = list_groups(c, s1)
             @test length(groups) == 2
 
-            group1 = groups[findfirst(x -> x.group_order == "0", groups)]
+            group1 = groups[findfirst(x -> string(x.group_order) == "0", groups)]
             @test group1.group_name == "first group"
             @test group1.description == ""
 
-            group2 = groups[findfirst(x -> x.group_order == "1", groups)]
+            group2 = groups[findfirst(x -> string(x.group_order) == "1", groups)]
             @test group2.group_name == "second group"
             @test group2.description == "description"
 
@@ -265,8 +266,8 @@ end
             groups = list_groups(c, s3)
             @test length(groups) == 2
 
-            group1 = groups[findfirst(x -> x.group_order == "1", groups)]
-            group2 = groups[findfirst(x -> x.group_order == "2", groups)]
+            group1 = groups[findfirst(x -> string(x.group_order) == "1", groups)]
+            group2 = groups[findfirst(x -> string(x.group_order) == "2", groups)]
 
             @test group1.group_name == "question group 1"
             @test group2.group_name == "question group 2"
@@ -288,7 +289,7 @@ end
 
             # get group properties
             props = get_group_properties(c, g1)
-            @test props.gid == string(g1)
+            @test string(props.gid) == string(g1)
             @test props.group_name == "first group"
             @test props.description == ""
 
@@ -318,13 +319,13 @@ end
             @test questions[2].help == "need help?"
 
             groups = list_groups(c, s)
-            gid = parse(Int, last(groups).gid)
+            gid = parse(Int, string(last(groups).gid))
             questions_g2 = list_questions(c, s, gid)
             @test length(questions_g2) == 1
             @test questions_g2[1].question == questions[2].question
 
             # delete question
-            qid = parse(Int, questions_g2[1].qid)
+            qid = parse(Int, string(questions_g2[1].qid))
             @test_throws LimeSurveyError delete_question!(c, 123)
             @test delete_question!(c, qid) == qid
             @test_throws LimeSurveyError("No questions found") list_questions(c, s, gid)
@@ -332,7 +333,7 @@ end
             # TODO: import question
 
             # get question properties
-            qid = parse(Int, questions[1].qid)
+            qid = parse(Int, string(questions[1].qid))
             props = get_question_properties(c, qid)
             @test props.title == "q1"
 
@@ -385,7 +386,7 @@ end
             # get participant properties
             tid = "1"
             token = first(participants_response).token
-            @test get_participant_properties(c, s, Dict("tid" => tid)).tid == tid
+            @test string(get_participant_properties(c, s, Dict("tid" => tid)).tid) == tid
             @test get_participant_properties(c, s, Dict("token" => token)).token == token
             @test collect(
                 keys(
@@ -445,7 +446,7 @@ end
             # add response
             @test add_response!(c, s, Dict()) == "1"
 
-            qid = q.sid * "X" * q.gid * "X" * q.qid
+            qid = string(q.sid) * "X" * string(q.gid) * "X" * string(q.qid)
             @test add_response!(c, s, Dict(qid => "a response")) == "2"
 
             @test export_responses(c, s, "csv") isa String
@@ -476,9 +477,9 @@ end
 
             # get summary
             summary = get_summary(c, s)
-            @test summary.completed_responses == "2"
-            @test summary.incomplete_responses == "0"
-            @test summary.full_responses == "2"
+            @test string(summary.completed_responses) == "2"
+            @test string(summary.incomplete_responses) == "0"
+            @test string(summary.full_responses) == "2"
 
             # export statistics
             @test export_statistics(c, s) isa String
