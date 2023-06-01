@@ -21,6 +21,6 @@ Export responses from remote survy with `survey_id` as a Tables.jl compatible `s
 function export_responses(client::CitrusClient, survey_id::Int, sink=nothing; kwargs...)
     isnothing(sink) && throw(ArgumentError("Provide a valid sink argument"))
     response = export_responses(client, survey_id, "csv"; kwargs...)
-    df = base64csv_to_sink(response, sink)
-    return df
+    tbl = base64csv_to_sink(response, sink)
+    return tbl
 end

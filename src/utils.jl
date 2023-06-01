@@ -8,11 +8,11 @@ end
 
 base64_to_string(x::AbstractString) = x |> base64decode |> String
 
-function base64csv_to_sink(x::AbstractString, sink; kwargs...)::DataFrame
+function base64csv_to_sink(x::AbstractString, sink; kwargs...)
     csv_string = base64_to_string(x)
     csv_io = IOBuffer(csv_string)
-    df = CSV.read(csv_io, sink; kwargs...)
-    return df
+    tbl = CSV.read(csv_io, sink; kwargs...)
+    return tbl
 end
 
 mutable struct LimeSurveyError <: Exception

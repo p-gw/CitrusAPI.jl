@@ -2,10 +2,10 @@ module CitrusAPI
 
 using Base64
 using CSV
-using DataFrames
 using Dates
 using HTTP
 using JSON3
+using Tables
 using UUIDs
 
 export CitrusClient, connect!, disconnect!
