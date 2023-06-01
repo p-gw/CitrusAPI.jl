@@ -9,8 +9,11 @@ If `create_token=true` (the default), access tokens will be automatically create
 
 See also: <https://api.limesurvey.org/classes/remotecontrol_handle.html#method_add_participants>
 """
-function add_participants!(client::CitrusClient, survey_id::Int, data; create_token=true)
-    payload = construct_payload("add_participants", [client.session_key, survey_id, data, create_token])
+function add_participants!(client::CitrusClient, survey_id::Int, data; create_token = true)
+    payload = construct_payload(
+        "add_participants",
+        [client.session_key, survey_id, data, create_token],
+    )
     response = call_limesurvey_api(client, payload)
     return response
 end

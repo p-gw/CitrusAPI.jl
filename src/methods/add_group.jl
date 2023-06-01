@@ -9,8 +9,14 @@ Optionally a question group `description` can be added.
 
 See also: <https://api.limesurvey.org/classes/remotecontrol_handle.html#method_add_group>
 """
-function add_group!(client::CitrusClient, survey_id::Int, title::AbstractString; description::AbstractString="")
-    payload = construct_payload("add_group", [client.session_key, survey_id, title, description])
+function add_group!(
+    client::CitrusClient,
+    survey_id::Int,
+    title::AbstractString;
+    description::AbstractString = "",
+)
+    payload =
+        construct_payload("add_group", [client.session_key, survey_id, title, description])
     response = call_limesurvey_api(client, payload)
     return response
 end

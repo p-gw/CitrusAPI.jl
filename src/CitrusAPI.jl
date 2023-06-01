@@ -24,8 +24,13 @@ Connect a LimeSurvey `client` by generating a session key given `username` and `
 
 See also: [`get_session_key`](@ref)
 """
-function connect!(client::CitrusClient, username::String, password::String; plugin="Authdb")
-    response = get_session_key(client, username, password, plugin=plugin)
+function connect!(
+    client::CitrusClient,
+    username::String,
+    password::String;
+    plugin = "Authdb",
+)
+    response = get_session_key(client, username, password, plugin = plugin)
     client.session_key = response
     @info "Connected to server '$(client.url)'\n\tSession key: $(client.session_key)"
     return response
@@ -45,7 +50,6 @@ function disconnect!(client::CitrusClient)
     return response
 end
 
-# helpers
 """
     is_active(client, survey_id)
 
@@ -65,7 +69,7 @@ Set the start date of the remote survey with `survey_id`
 
 See also: [`set_survey_properties!`](@ref)
 """
-function start_survey!(client, survey_id, datetime::DateTime=now())
+function start_survey!(client, survey_id, datetime::DateTime = now())
     response = set_survey_properties!(client, survey_id, Dict("startdate" => datetime))
     return response
 end
@@ -77,7 +81,7 @@ Set the expiry date of the remote survey with `survey_id`.
 
 See also: [`set_survey_properties!`](@ref)
 """
-function expire_survey!(client, survey_id, datetime::DateTime=now())
+function expire_survey!(client, survey_id, datetime::DateTime = now())
     response = set_survey_properties!(client, survey_id, Dict("expires" => datetime))
     return response
 end

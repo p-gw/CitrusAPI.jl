@@ -10,6 +10,6 @@ mutable struct CitrusClient
     session_key::Union{Nothing,String}
 end
 
-function CitrusClient(url::String, session_key=nothing)
+function CitrusClient(url::String, session_key = nothing)
     return CitrusClient(url, session_key)
 end

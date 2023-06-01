@@ -17,8 +17,17 @@ A survey can also be imported directly froma valid `file`.
 
 See also: <https://api.limesurvey.org/classes/remotecontrol_handle.html#method_import_survey>
 """
-function import_survey!(client::CitrusClient, data::String, data_type::String; name::Union{Nothing,String}=nothing, survey_id::Union{Nothing,Int}=nothing)
-    payload = construct_payload("import_survey", [client.session_key, data, data_type, name, survey_id])
+function import_survey!(
+    client::CitrusClient,
+    data::String,
+    data_type::String;
+    name::Union{Nothing,String} = nothing,
+    survey_id::Union{Nothing,Int} = nothing,
+)
+    payload = construct_payload(
+        "import_survey",
+        [client.session_key, data, data_type, name, survey_id],
+    )
     response = call_limesurvey_api(client, payload)
     return response
 end

@@ -12,8 +12,18 @@ A group can also be imported directly from a valid `lsg` or `csv` file by specif
 
 See also: <https://api.limesurvey.org/classes/remotecontrol_handle.html#method_import_group>
 """
-function import_group!(client::CitrusClient, survey_id::Int, data::String, data_type::String; name::Union{Nothing,String}=nothing, description::Union{Nothing,String}=nothing)
-    payload = construct_payload("import_group", [client.session_key, survey_id, data, data_type, name, description])
+function import_group!(
+    client::CitrusClient,
+    survey_id::Int,
+    data::String,
+    data_type::String;
+    name::Union{Nothing,String} = nothing,
+    description::Union{Nothing,String} = nothing,
+)
+    payload = construct_payload(
+        "import_group",
+        [client.session_key, survey_id, data, data_type, name, description],
+    )
     response = call_limesurvey_api(client, payload)
     return response
 end

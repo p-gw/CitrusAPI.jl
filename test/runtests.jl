@@ -30,7 +30,7 @@ end
         encoded = base64encode("Teststring")
         @test CitrusAPI.base64_to_string(encoded) == "Teststring"
 
-        df = DataFrame(a=1:3, b=["a", "b", "c"])
+        df = DataFrame(a = 1:3, b = ["a", "b", "c"])
         df_encoded = dataframe_to_base64csv(df)
         @test CitrusAPI.base64csv_to_sink(df_encoded, DataFrame) == df
     end
@@ -60,8 +60,16 @@ end
         c = CitrusClient("http://127.0.0.1:8082/index.php/admin/remotecontrol")
 
         @testset "Connection" begin
-            @test_throws LimeSurveyError("Invalid user name or password") get_session_key(c, "", "")
-            @test_throws LimeSurveyError("Invalid user name or password") connect!(c, "", "")
+            @test_throws LimeSurveyError("Invalid user name or password") get_session_key(
+                c,
+                "",
+                "",
+            )
+            @test_throws LimeSurveyError("Invalid user name or password") connect!(
+                c,
+                "",
+                "",
+            )
 
             @test_throws AuthenticationError release_session_key(c)
             @test_throws AuthenticationError disconnect!(c)
@@ -89,7 +97,12 @@ end
             @test s3 == 222222
 
             # surveys require valid languages
-            @test_throws LimeSurveyError("Faulty parameters") add_survey!(c, 999999, "testsurvey-4", "invalid language")
+            @test_throws LimeSurveyError("Faulty parameters") add_survey!(
+                c,
+                999999,
+                "testsurvey-4",
+                "invalid language",
+            )
 
             # duplicate survey ids lead to randomized survey ids
             s5 = add_survey!(c, 123456, "testsurvey-5", "en")
@@ -103,7 +116,8 @@ end
             surveys = list_surveys(c, DataFrame)
             @test surveys isa DataFrame
             @test nrow(surveys) == 4
-            @test names(surveys) == ["sid", "surveyls_title", "startdate", "expires", "active"]
+            @test names(surveys) ==
+                  ["sid", "surveyls_title", "startdate", "expires", "active"]
 
             # import surveys
             s6 = import_survey!(c, "limesurvey/999999.lss")
@@ -113,7 +127,10 @@ end
             @test_throws LimeSurveyError("Invalid survey ID") activate_survey!(c, 100000)
             @test_throws LimeSurveyError("Invalid survey ID") is_active(c, 100000)
 
-            @test_throws LimeSurveyError("Survey does not pass consistency check") activate_survey!(c, s1)
+            @test_throws LimeSurveyError("Survey does not pass consistency check") activate_survey!(
+                c,
+                s1,
+            )
             @test is_active(c, s1) == false
 
             res = activate_survey!(c, s6)  # s6 contains questions and should be ready to activate
@@ -158,7 +175,8 @@ end
             @test delete_language!(c, s1, "de").status == "OK"
 
             if VERSION >= v"1.7"
-                @test get_survey_properties(c, s1).additional_languages == "" broken = LS_VERSION <= v"3"
+                @test get_survey_properties(c, s1).additional_languages == "" broken =
+                    LS_VERSION <= v"3"
             else
                 if LS_VERSION <= v"3"
                     @test_broken get_survey_properties(c, s1).additional_languages == ""
@@ -170,13 +188,14 @@ end
             # get language properties
             default_props = get_language_properties(c, s1)
             @test default_props.surveyls_language == "en"
-            @test default_props == get_language_properties(c, s1; language="en")
+            @test default_props == get_language_properties(c, s1; language = "en")
 
-            props_noexist = get_language_properties(c, s1; language="de")
+            props_noexist = get_language_properties(c, s1; language = "de")
             @test isnothing(props_noexist.surveyls_language)
 
             # set language properties
-            set_lang = set_language_properties!(c, s1, Dict("surveyls_title" => "testtitle"))
+            set_lang =
+                set_language_properties!(c, s1, Dict("surveyls_title" => "testtitle"))
             @test set_lang.status == "OK"
             @test set_lang.surveyls_title == true
             @test get_language_properties(c, s1).surveyls_title == "testtitle"
@@ -214,7 +233,7 @@ end
 
             # add question groups
             g1 = add_group!(c, s1, "first group")
-            g2 = add_group!(c, s1, "second group", description="description")
+            g2 = add_group!(c, s1, "second group", description = "description")
 
             @test g1 isa Integer
             @test g2 isa Integer
@@ -337,8 +356,16 @@ end
 
             # add participants
             participants = [
-                Dict("email" => "test1@test.co", "firstname" => "participant", "lastname" => "1"),
-                Dict("email" => "test2@test.co", "firstname" => "participant", "lastname" => "2")
+                Dict(
+                    "email" => "test1@test.co",
+                    "firstname" => "participant",
+                    "lastname" => "1",
+                ),
+                Dict(
+                    "email" => "test2@test.co",
+                    "firstname" => "participant",
+                    "lastname" => "2",
+                ),
             ]
 
             participants_response = add_participants!(c, s, participants)
@@ -349,18 +376,36 @@ end
 
             # list participants
             @test length(list_participants(c, s)) == 2
-            @test_throws LimeSurveyError("No survey participants found.") list_participants(c, s, 100)
+            @test_throws LimeSurveyError("No survey participants found.") list_participants(
+                c,
+                s,
+                100,
+            )
 
             # get participant properties
             tid = "1"
             token = first(participants_response).token
             @test get_participant_properties(c, s, Dict("tid" => tid)).tid == tid
             @test get_participant_properties(c, s, Dict("token" => token)).token == token
-            @test collect(keys(get_participant_properties(c, s, Dict("tid" => tid), properties=["tid", "token"]))) == [:tid, :token]
+            @test collect(
+                keys(
+                    get_participant_properties(
+                        c,
+                        s,
+                        Dict("tid" => tid),
+                        properties = ["tid", "token"],
+                    ),
+                ),
+            ) == [:tid, :token]
 
             # set participant properties
             new_mail = "a@b.co"
-            new_participant = set_participant_properties!(c, s, Dict("tid" => tid), Dict("email" => new_mail))
+            new_participant = set_participant_properties!(
+                c,
+                s,
+                Dict("tid" => tid),
+                Dict("email" => new_mail),
+            )
             @test new_participant.email == new_mail
             @test get_participant_properties(c, s, Dict("tid" => tid)).email == new_mail
 
@@ -387,7 +432,11 @@ end
             set_survey_properties!(c, s, Dict("alloweditaftercompletion" => "Y"))
 
             activate_tokens!(c, s)
-            add_participants!(c, s, [Dict("email" => "test@test.co", "firstname" => "A", "lastname" => "B")])
+            add_participants!(
+                c,
+                s,
+                [Dict("email" => "test@test.co", "firstname" => "A", "lastname" => "B")],
+            )
             token = get_participant_properties(c, s, Dict("tid" => "1")).token
 
             # export responses
@@ -411,7 +460,8 @@ end
             @test nrow(export_responses(c, s, DataFrame)) == 1
 
             # update response
-            @test update_response!(c, s, Dict("id" => "2", qid => "updated response")) == true
+            @test update_response!(c, s, Dict("id" => "2", qid => "updated response")) ==
+                  true
             responses = export_responses(c, s, DataFrame)
             @test nrow(responses) == 1
             @test responses.q1 == ["updated response"]
