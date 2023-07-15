@@ -1,7 +1,6 @@
 services:
   limesurvey:
-    build:
-      dockerfile: Dockerfile
+    build: .
     ports:
       - 8082:80
     environment:
