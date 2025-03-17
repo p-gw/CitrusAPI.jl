@@ -16,7 +16,7 @@ function call_limesurvey_api(client::CitrusClient, payload; authenticated = true
     end
 
     headers = construct_headers()
-    response = HTTP.post(client.url, headers, payload)
+    response = HTTP.post(client.url, headers, payload; client.http_args...)
     parsed_body = JSON3.read(response.body)
 
     if !isnothing(parsed_body.error)
