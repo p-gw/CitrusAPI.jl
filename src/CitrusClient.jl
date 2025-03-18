@@ -8,8 +8,9 @@
 mutable struct CitrusClient
     url::String
     session_key::Union{Nothing,String}
+    http_args::Base.Pairs
 end
 
-function CitrusClient(url::String, session_key = nothing)
-    return CitrusClient(url, session_key)
+function CitrusClient(url::String, session_key = nothing; kwargs...)
+    return CitrusClient(url, session_key, kwargs)
 end
